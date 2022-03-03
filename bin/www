@@ -88,3 +88,16 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+var pool = require("../models/connection");
+process.once('SIGTERM', end);
+function end() {
+  server.close(function (err) {
+    if (err) throw err;
+    console.log('Server endded!'); 
+    pool.end(function (err) {
+      if (err) throw err; 
+      process.exit();
+    });
+  });
+}
