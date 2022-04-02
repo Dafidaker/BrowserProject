@@ -89,20 +89,6 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-var pg = require('pg');
-require('dotenv').config();
-
-const connectionString = process.env.DATABASE_URL
-const Pool = pg.Pool
-const pool = new Pool({
-    connectionString,
-    max: 10,
-      ssl: {
-          require: true, 
-          rejectUnauthorized: false
-      }
-})
-
 
 
 var pool = require("../models/connection");
