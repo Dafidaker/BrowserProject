@@ -2,12 +2,12 @@ var pool = require('./connection.js')
     
 module.exports.loginCheck = async function (name,password) {
     try {
-      let sql = `Select ply_id from player where ply_name = $1 and ply_passwd = $2`;
+      let sql = `Select player_id from player where player_name = $1 and player_password = $2`;
       let result = await pool.query(sql,[name,password]);
       if (result.rows.length == 0) {
           return { status: 401, result: {msg: "Wrong password or username."}}
       }
-      let ply_id = result.rows[0].ply_id;
+      let ply_id = result.rows[0].player_id;
       return { status: 200, result: {msg: "Login correct", userId : ply_id} };
     } catch (err) {
       console.log(err);
