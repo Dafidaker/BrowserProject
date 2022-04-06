@@ -129,3 +129,30 @@ app.get('/battle_states', async function( req, res) {
         res.status(500).send(err);
       }
     })
+
+    
+  app.get('/player_info', async function( req, res) {
+    console.log('helo')
+    let sql = 'select * from player'
+    let result = await pool.query(sql)
+      try{
+        console.log(result.rows);
+        res.status(200).send(result.rows);
+      } catch(err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
+    })
+
+    app.get('/player_tile', async function( req, res) {
+      console.log('helo')
+      let sql = 'select room_player1_id , room_player2_id , room_player1_tile_id , room_player2_tile_id from room , player where room_id = player_room_id and player_id = 1 '
+      let result = await pool.query(sql)
+        try{
+          console.log(result.rows);
+          res.status(200).send(result.rows);
+        } catch(err) {
+          console.log(err);
+          res.status(500).send(err);
+        }
+      })
