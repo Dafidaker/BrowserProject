@@ -121,6 +121,7 @@ app.get('/battle_states', async function( req, res) {
     console.log('helo')
     let sql = 'select * from deck where deck_player_id = 1'
     let result = await pool.query(sql)
+    print(result.row[0].deck_card_id)
       try{
         console.log(result.rows);
         res.status(200).send(result.rows);
