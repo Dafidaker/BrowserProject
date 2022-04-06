@@ -121,7 +121,7 @@ app.get('/battle_states', async function( req, res) {
     console.log('helo')
     let sql = 'select * from deck where deck_player_id = 1'
     let result = await pool.query(sql)
-    let card_id = result.row[0].deck_card_id
+    let card_id = result.deck_card_id
     print(card_id)
       try{
         console.log(result.rows);
