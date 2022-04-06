@@ -1,5 +1,6 @@
 async function loginUser() {
     try {
+        console.log("1")
         let name = document.getElementById("name").value;
         let password = document.getElementById("password").value;
         let result = await login(name, password);

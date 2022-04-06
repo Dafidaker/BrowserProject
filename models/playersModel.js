@@ -2,10 +2,9 @@ var pool = require('./connection.js')
     
 module.exports.loginCheck = async function (name,password) {
     try {
-        console.log(name);
-        console.log(password);
-      let sql = `Select player_id from player where player_name = $1 and player_password = $2`;
+      let sql = `Select player_id from player where player_name = 'Player 1' and player_password = '1'`;
       let result = await pool.query(sql,[name,password]);
+      console.log(result);
       if (result.rows.length == 0) {
           return { status: 401, result: {msg: "Wrong password or username."}}
       }
