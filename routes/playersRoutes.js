@@ -18,6 +18,7 @@ router.post('/login', async function(req, res, next) {
     let password = req.body.password;
     let result = await uModel.loginCheck(name,password);
     console.log("2")
+    console.log(result)
     if (result.status == 200) {
         auth.saveUserId(res,result.result.userId);
         res.status(result.status).send({msg:"User logged in"});
