@@ -4,7 +4,7 @@ module.exports.loginCheck = async function (name,password) {
     try {
       let sql = `Select player_id from player where player_name = 'Player 1' and player_password = '1'`;
       let result = await pool.query(sql,[name,password]);
-      console.log(result.rows.length);
+      console.log( '%s', result.rows.length);
       if (result.rows.length == 0) {
           return { status: 401, result: {msg: "Wrong password or username."}}
       }
