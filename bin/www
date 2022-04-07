@@ -128,8 +128,8 @@ app.get('/battle_states', async function( req, res) {
         console.log(err);
         res.status(500).send(err);
       }
-      let card_id = result.row[0].deck_card_id
-      print(card_id)
+      /* let card_id = result.row[0].deck_card_id
+      print(card_id) */
     })
 
     
