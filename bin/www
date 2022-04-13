@@ -89,8 +89,6 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-
-
 var pool = require("../models/connection");
 process.once('SIGTERM', end);
 function end() {
@@ -103,6 +101,8 @@ function end() {
     });
   });
 }
+
+
 
 app.get('/battle_states', async function( req, res) {
   console.log('helo')
@@ -120,8 +120,9 @@ app.get('/battle_states', async function( req, res) {
   app.get('/deck', async function( req, res) {
     console.log('helo')
     let sql = 'select * from deck where deck_player_id = 1'
-    let result = await pool.query(sql)
+
       try{
+        let result = await pool.query(sql)
         console.log(result.rows);
         res.status(200).send(result.rows);
       } catch(err) {
@@ -133,11 +134,11 @@ app.get('/battle_states', async function( req, res) {
     })
 
     
-  app.get('/player_info', async function( req, res) {
-    console.log('helo')
-    let sql = 'select * from player'
-    let result = await pool.query(sql)
+  app.get('/player_info/:playerid', async function( req, res) {
+    let playerid = req.params.playerid
+    let sql = 'select * from player where player_id = $1'
       try{
+        let result = await pool.query(sql,[playerid])
         console.log(result.rows);
         res.status(200).send(result.rows);
       } catch(err) {
@@ -147,10 +148,11 @@ app.get('/battle_states', async function( req, res) {
     })
 
     app.get('/player_tile', async function( req, res) {
-      console.log('helo')
-      let sql = 'select room_player1_id , room_player2_id , room_player1_tile_id , room_player2_tile_id from room , player where room_id = player_room_id and player_id = 1 '
-      let result = await pool.query(sql)
+
+      let sql = `select room_player1_id , room_player2_id, room_player1_tile_id , room_player2_tile_id from room , 
+                  player where room_id = player_room_id and player_id = 1`
         try{
+          let result = await pool.query(sql)
           console.log(result.rows);
           res.status(200).send(result.rows);
         } catch(err) {
@@ -159,11 +161,12 @@ app.get('/battle_states', async function( req, res) {
         }
       })
 
-      app.get('/round_num', async function( req, res) {
-        console.log('helo')
-        let sql = 'select battle_round from battle where battle_id = 1'
-        let result = await pool.query(sql)
+      app.get('/round_num/:battleId', async function( req, res) {
+        let battleId = req.params.battleId;
+        let sql = 'select battle_round from battle where battle_id = $1'
+
           try{
+            let result = await pool.query(sql, [battleId])
             console.log(result.rows);
             res.status(200).send(result.rows);
           } catch(err) {
@@ -172,12 +175,40 @@ app.get('/battle_states', async function( req, res) {
           }
         })
 
-        async function round() {
-          app.get('/round_num', async function( req, res) {
-            console.log('helo')
-            let sql = 'select battle_round from battle where battle_id = 1'
-            let result = await pool.query(sql)
+        app.post('/deck', async function( req, res) {
+          let plyId = req.body.plyId;
+          let sql = 'select card_id from card';
+  
+            try{
+              let result = await pool.query(sql);
+              if(result.rows.length > 0){
+                sql = `insert into deck (deck_player_id,deck_order,deck_card_id) values`;
+
+                for(let i = 0; i < result.rows.length; i++){
+                  sql += `(${plyId}, ${i+1}, ${result.rows[i].card_id})`;
+
+                  if(result.rows.length -1 == i){
+                    sql += `;`;
+                  } else{
+                    sql += `,`;
+                  }
+                }
+              }
+
+              result = await pool.query(sql);
+              res.status(200).send({ms: "Inserted"});
+            } catch(err) {
+              console.log(err);
+              res.status(500).send(err);
+            }
+          })
+
+          app.get('/get_deck/:playerid', async function( req, res) {
+            let playerid = req.params.playerid;
+            let sql = 'select * from deck where deck_player_id = $1 order by deck_order';
+    
               try{
+                let result = await pool.query(sql,[playerid]);
                 console.log(result.rows);
                 res.status(200).send(result.rows);
               } catch(err) {
@@ -185,4 +216,3 @@ app.get('/battle_states', async function( req, res) {
                 res.status(500).send(err);
               }
             })
-        }
