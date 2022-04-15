@@ -161,7 +161,7 @@ app.get('/battle_states', async function( req, res) {
       })
 
       app.get('/round_num/:playerid', async function( req, res) {
-        let playerid = req.params.battleId;
+        let playerid = req.params.playerid;
         let sql = 'select room_round_number , state_name from room , battle_states where room_player_id = $1 and room_state_id = state_id '
 
           try{

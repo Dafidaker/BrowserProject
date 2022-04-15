@@ -131,6 +131,8 @@ async function getBattleRound() {
         const response = await fetch(`/round_num/${playerid}`);
         if (response.status == 200) {
            var battleRound= await response.json();
+           print('Round :' + (battleRound[0].room_round_number));
+           print('State :' + (battleRound[0].state_name));
            cur_round = 'Round ' + (battleRound[0].room_round_number) + ' - '  + (battleRound[0].state_name); // Round [nº]
         } else {
             // Treat errors like 404 here
