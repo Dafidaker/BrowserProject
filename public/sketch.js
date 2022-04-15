@@ -8,16 +8,17 @@
   let canvasx
   let canvasy
   let chessbuttons = {}
-  let playerif = {mana: 0 , health:20}
+  let playerif = {mana: 0 , mana_total:0, health:20}
   
  
 
 function setup() {
-    canvasx = windowWidth
-    canvasy = windowHeight
-   let canvas = createCanvas(canvasx, canvasy);
+    canvasx = windowWidth -25
+    canvasy = windowHeight -25
+   let canvas = createCanvas(canvasx  , canvasy);
     canvas.parent('game');
-    gamestart()
+    gamestart();
+    background(233, 225, 206);
   }
 
   function gamestart() {
@@ -31,9 +32,10 @@ function setup() {
   }
 
   function draw() {
+    
      draw_all_rect() ;
-     //draw_hud();
-     rect(100,100,100,100);
+     draw_hud();
+     //rect(100,100,100,100);
      //print('update')
     /* text(mouseX,50,50)
     text(mouseY,50,70) */
@@ -69,26 +71,41 @@ function draw_all_rect(){
 } 
 
 function draw_hud(){ 
-    var width = 480
-    var height = 70 
+    //let roundinfo = cur_round + ' - ' + 'p1 attacking'
     // round number
-    rect((canvasx/2) - (width/2) ,50,width,height)
-    textSize(50)
-    text(cur_round,(canvasx/2)-(textWidth(cur_round)/2) ,height + (height/2))
+    rect(canvasx*0.3 ,canvasy*0.05,canvasx*0.4,canvasy*0.07)
+    textSize(45)
+    fill(0, 0, 0)
+    text(cur_round,(canvasx/2)-(textWidth(cur_round)/2) ,canvasy*0.07 + (canvasy*0.07/2))
+
     // player information 
-    rect((canvasx*0.8) ,(canvasy*0.8),(canvasx*0.2),(canvasy*0.2))
-    textSize(20)
-    text(playerif.health,(canvasx*0.8) +10 ,(canvasy*0.8) +40)
-    text(playerif.mana,(canvasx*0.8) +10 ,(canvasy*0.8) +70)
+    fill(255,255,255)
+    rect((canvasx*0.8) ,(canvasy*0.79),(canvasx*0.18),(canvasy*0.18))
+    textSize(30)
+    fill(0, 153, 15)
+    text('HEALTH : ' + playerif.health + ' /20',(canvasx*0.8) +10 ,(canvasy*0.79) +50)
+    fill(0, 175, 235)
+    text('MANA : ' + playerif.mana + '/' + playerif.mana_total,(canvasx*0.8) +10 ,(canvasy*0.79) +100)
+    fill(228, 164, 7)
+    text('ENERGY : ' + playerif.mana +' /3',(canvasx*0.8) +10 ,(canvasy*0.79) +150)
+
     //text(playerinfo[0].player_mana,(canvasx*0.8) +10 ,(canvasy*0.8) +30) 
     
+    //buttons
+    fill(255, 255, 255)
+    circle(canvasx*0.2,canvasy*0.8,canvasx*0.08)
+    circle(canvasx*0.08,canvasy*0.7,canvasx*0.08)
+    fill(0, 0, 0)
+    text('Get'+'\n'+'  a'+'\n'+'Card',canvasx*0.2-((canvasx*0.08)/4),canvasy*0.8)
+    text('Basic'+'\n'+'Attack',canvasx*0.08-((canvasx*0.08)/4),canvasy*0.7)
+    fill(255, 255, 255)
+
 }
 
 
 function CheckClick(x,y,x1,y1,w1,h1){
     if((x >= x1) && (x <=  x1 + w1)){
         if((y >= y1) && (y <= y1 + h1)){
-           console.log('aaa')
         return true  
         }
     } 
@@ -110,11 +127,11 @@ function CheckClick(x,y,x1,y1,w1,h1){
 
 async function getBattleRound() {
     try {
-        let battleId = 1;
-        const response = await fetch(`/round_num/${battleId}`);
+        let playerid = 1;
+        const response = await fetch(`/round_num/${playerid}`);
         if (response.status == 200) {
            var battleRound= await response.json();
-           cur_round = 'Round ' + (battleRound[0].battle_round); // Round [nº]
+           cur_round = 'Round ' + (battleRound[0].room_round_number) + ' - '  + (battleRound[0].state_name); // Round [nº]
         } else {
             // Treat errors like 404 here
             console.log(response);
@@ -137,6 +154,7 @@ async function getplayerinformation() {
            print('health :' + (playerinfo[0].player_health));
            playerif = {
                mana:playerinfo[0].player_mana,
+               mana_total:playerinfo[0].player_total_mana,
                health:playerinfo[0].player_health
            }
            return playerinfo

@@ -147,12 +147,11 @@ app.get('/battle_states', async function( req, res) {
       }
     })
 
-    app.get('/player_tile', async function( req, res) {
-
-      let sql = `select room_player1_id , room_player2_id, room_player1_tile_id , room_player2_tile_id from room , 
-                  player where room_id = player_room_id and player_id = 1`
+    app.get('/player_tile/:playerid', async function( req, res) {
+      let playerid = req.params.playerid
+      let sql = `select player_tile_id from player where player_id = $1`
         try{
-          let result = await pool.query(sql)
+          let result = await pool.query(sql,[playerid])
           console.log(result.rows);
           res.status(200).send(result.rows);
         } catch(err) {
@@ -161,12 +160,12 @@ app.get('/battle_states', async function( req, res) {
         }
       })
 
-      app.get('/round_num/:battleId', async function( req, res) {
-        let battleId = req.params.battleId;
-        let sql = 'select battle_round from battle where battle_id = $1'
+      app.get('/round_num/:playerid', async function( req, res) {
+        let playerid = req.params.battleId;
+        let sql = 'select room_round_number , state_name from room , battle_states where room_player_id = $1 and room_state_id = state_id '
 
           try{
-            let result = await pool.query(sql, [battleId])
+            let result = await pool.query(sql, [playerid])
             console.log(result.rows);
             res.status(200).send(result.rows);
           } catch(err) {
