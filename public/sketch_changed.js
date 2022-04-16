@@ -1,4 +1,5 @@
 //const { text } = require("body-parser");
+import * as board from './board'
 
   var i = 0;
   var battleRound;
@@ -9,27 +10,24 @@
   let canvasy
   let chessbuttons = {}
   let playerif = {mana: 0 , mana_total:0, health:20, energy:3}
-  let textsize
-  let scalen  
-  let selected_tile_id
-    let playersposition 
+  let scale_forwindow 
+ 
 
 function setup() {
     canvasx = windowWidth -25
     canvasy = windowHeight -25
-    textsize = ((canvasx*canvasy)*45)/1709290
-    scalen = 1
+    scale_forwindow = 1
     let canvas = createCanvas(canvasx  , canvasy);
     canvas.parent('game');
     gamestart();
     background(233, 225, 206);
+    print(board.op)
   }
 
   function gamestart() {
     getBattleRound()
     getplayerinformation()
     getplayerdeck()
-    getplayersposition()
 }
 
   function updateME(){
@@ -37,7 +35,7 @@ function setup() {
   }
 
   function draw() {
-    scale(scalen)
+    scale(scale_forwindow)
      draw_all_rect() ;
      draw_hud();
      //rect(100,100,100,100);
@@ -49,6 +47,11 @@ function setup() {
      updateME();
      
   } 
+  function mousePressed(){
+    print('canvas width: ' + canvasx)
+    print('canvas height: ' + canvasy)
+
+  }
   
 
 
@@ -78,14 +81,15 @@ function draw_all_rect(){
 function draw_hud(){ 
     //let roundinfo = cur_round + ' - ' + 'p1 attacking'
     // round number
-    rect(canvasx*0.3 ,canvasy*0.05,canvasx*0.4,canvasy*0.07)
+    rect(canvasx*0.3 ,canvasy*0.05,1895*0.4,902*0.07)
     textSize(45)
     fill(0, 0, 0)
     text(cur_round,(canvasx/2)-(textWidth(cur_round)/2) ,canvasy*0.07 + (canvasy*0.07/2))
 
     // player information 
     fill(255,255,255)
-    rect((canvasx*0.8) ,(canvasy*0.79),(canvasx*0.18),(canvasy*0.18))
+    //rect((canvasx*0.8) ,(canvasy*0.79),(canvasx*0.18),(canvasy*0.18))
+    rect((canvasx*0.8) ,(canvasy*0.79),(1895*0.18),(902*0.18))
     textSize(30)
     fill(0, 153, 15)
     text('HEALTH : ' + playerif.health + ' /20',(canvasx*0.8) +10 ,(canvasy*0.84) )
@@ -109,8 +113,8 @@ function draw_hud(){
 
 
 function CheckClick(x,y,x1,y1,w1,h1){
-    if((x >= x1*scalen) && (x <=  (x1 + w1)*scalen)){
-        if((y >= y1*scalen) && (y <= (y1 + h1)*scalen)){
+    if((x >= x1*scale_forwindow) && (x <=  (x1 + w1)*scale_forwindow)){
+        if((y >= y1*scale_forwindow) && (y <= (y1 + h1)*scale_forwindow)){
         return true  
         }
     } 
@@ -122,8 +126,8 @@ function CheckClick(x,y,x1,y1,w1,h1){
     for (a=1 ; a <= 81; a++){
         //print('uu')
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
-            selected_tile_id = a 
-            print('index ' + selected_tile_id)
+            k = a 
+            print('index ' + k)
             break
         }
     }
@@ -205,23 +209,6 @@ async function getplayerdeck() {
         if (response.status == 200) {
            var playerdeck= await response.json();
            print(playerdeck);
-        } else {
-            // Treat errors like 404 here
-            console.log(response);
-        }
-    } catch (err) {
-        // Treat 500 errors here
-        console.log(err);
-    }
-} 
-
-async function getplayersposition() {
-    try {
-        let playerid = 1;
-        const response = await fetch(`/player_tile/${playerid}`);
-        if (response.status == 200) {
-           playersposition = await response.json();
-           print('players position '+ playersposition);
         } else {
             // Treat errors like 404 here
             console.log(response);
