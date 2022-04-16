@@ -150,14 +150,11 @@ app.get('/battle_states', async function( req, res) {
     // gets both player tile (player as your tile / enemy as the enemy's tile )
     app.get('/player_tile/:playerid', async function( req, res) {
       let playerid = req.params.playerid
-      let sql = `select player_tile_id , 
-      CASE
-       when player_id = $1 then 'player'
-       when player_id != $1 then 'enemy'
-       END  player
+      let sql = `select player_tile_id , player_num
       from room , player ,
       (select room_num as the_room from room where room_player_id = $1 ) temptable1
-      where room_num = the_room and player_id = room_player_id`
+      where room_num = the_room and player_id = room_player_id
+	  order by player_num asc`
         try{
           let result = await pool.query(sql,[playerid])
           console.log(result.rows);

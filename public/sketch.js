@@ -12,7 +12,10 @@
   let textsize
   let scalen  
   let selected_tile_id
-    let playersposition 
+let playersposition 
+let player_tile
+let users_num = 1
+
 
 function setup() {
     canvasx = windowWidth -25
@@ -221,7 +224,13 @@ async function getplayersposition() {
         const response = await fetch(`/player_tile/${playerid}`);
         if (response.status == 200) {
            playersposition = await response.json();
-           print('players position '+ playersposition);
+           if (users_num = 1) {
+            player_tile = playersposition[0].player_tile_id
+           }else {
+            player_tile = playersposition[1].player_tile_id
+           }
+           print('players position '+ playersposition[0].player_tile_id);
+           print('players position '+ playersposition[1].player_tile_id);
         } else {
             // Treat errors like 404 here
             console.log(response);
