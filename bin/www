@@ -240,7 +240,7 @@ app.get('/battle_states', async function( req, res) {
                         player_health = ${ply_health} ,
                         player_energy = ${ply_energy}
 
-                        WHERE player_id = ${playerid}`;
+                        WHERE player_id = 1`;
                   }
     
                   let result1 = await pool.query(sql);
