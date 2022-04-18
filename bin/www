@@ -221,7 +221,7 @@ app.get('/battle_states', async function( req, res) {
               }
             })
 
-            app.post('/player_information_change/:playerid', async function( req, res) {
+            /* app.post('/player_information_change/:playerid', async function( req, res) {
               
               let ply_health = req.body.ply_health;
               let ply_mana = req.body.ply_mana;
@@ -250,4 +250,4 @@ app.get('/battle_states', async function( req, res) {
                   console.log(err);
                   res.status(500).send(err);
                 }
-              })
+              }) */
