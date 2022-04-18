@@ -229,6 +229,7 @@ app.get('/battle_states', async function( req, res) {
               let ply_energy = req.body.ply_energy;
               let playerid = req.params.playerid;
               let sql = 'select * from player where player_id = $1 ';
+              playerid = 1 
       
                 try{
                   let result = await pool.query(sql,[playerid]);
