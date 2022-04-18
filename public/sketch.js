@@ -297,6 +297,30 @@ async function MakeDeck() {
     }
 }
 
+async function ChangePlayerInfo() {
+    try {
+        let player_id
+        const response = await fetch(`/player_information_change/${player_id}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify({ plyId: 1}) 
+        });
+        if (response.status == 200) {
+           var  result= await response.json();
+           print(result);
+        } else {
+            // Treat errors like 404 here
+            console.log(response);
+        }
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+    }
+}
+
 async function getplayerdeck() {
     try {
         let playerid = 1;
