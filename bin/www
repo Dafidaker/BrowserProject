@@ -227,7 +227,7 @@ app.get('/battle_states', async function( req, res) {
               let ply_mana = req.body.ply_mana;
               let ply_total_mana = req.body.ply_total_mana;
               let ply_energy = req.body.ply_energy;
-              
+              let ply_id = req.body.ply_energy
                 try{
                   sql = `UPDATE player
                         SET player_mana = ${ply_mana},
@@ -235,7 +235,7 @@ app.get('/battle_states', async function( req, res) {
                         player_health = ${ply_health} ,
                         player_energy = ${ply_energy}
 
-                        WHERE player_id = 1`;
+                        WHERE player_id = ${ply_id}`;
                   //let result = await pool.query(sql);
                   /* if(result.rows.length >= 0){
                     sql = `UPDATE player

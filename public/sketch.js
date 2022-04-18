@@ -43,6 +43,7 @@ function setup() {
     getplayerinformation()
     getplayerdeck()
     getplayersposition()
+    
     }
 
   function updateME(){
@@ -297,7 +298,7 @@ async function MakeDeck() {
     }
 }
 
-async function ChangePlayerInfo() {
+async function ChangePlayerInfo(plyId,ply_health,ply_total_mana,ply_mana) {
     try {
         let player_id
         const response = await fetch(`/player_information_change/${player_id}`,
@@ -306,7 +307,7 @@ async function ChangePlayerInfo() {
             headers: {
                 "Content-Type": "application/json"
               },
-            body: JSON.stringify({ plyId: 1}) 
+            body: JSON.stringify({ plyId: plyId, ply_health: ply_health, ply_total_mana: ply_total_mana, ply_mana: ply_mana,ply_energy: ply_energy }) 
         });
         if (response.status == 200) {
            var  result= await response.json();
