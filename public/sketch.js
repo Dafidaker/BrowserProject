@@ -4,25 +4,37 @@
   var battleRound;
   var playerinfo;
   var playerdeck;
-  var cur_round;
+  var cur_round = 'aaaa';
   let canvasx
   let canvasy
   let chessbuttons = {}
   let playerif = {mana: 0 , mana_total:0, health:20, energy:3}
   let textsize
   let scalen  
-  let selected_tile_id
+  let selected_tile_id = 100 
+  
 let playersposition 
-let player_tile
+let player_tile = 2
+let enemy_tile = 2
 let users_num = 1
+let moving = false 
 
 
 function setup() {
-    canvasx = windowWidth -25
-    canvasy = windowHeight -25
+    canvasx = windowWidth 
+    canvasy = windowHeight 
+    var biggerside = Math.max(canvasx,canvasy)
+    print('biggerside:'  + biggerside)
+    if (biggerside = canvasx ){
+        ((biggerside /2)> canvasy) ? canvasy = canvasy : canvasy = biggerside /2
+    }else {
+        ((biggerside /2)> canvasx) ? canvasx = canvasx : canvasx = biggerside /2
+    }
+
+    scalen = (biggerside/1920)
     textsize = ((canvasx*canvasy)*45)/1709290
-    scalen = 1
-    let canvas = createCanvas(canvasx  , canvasy);
+    //scalen = 1
+    let canvas = createCanvas(canvasx -25  , canvasy -25);
     canvas.parent('game');
     gamestart();
     background(233, 225, 206);
@@ -33,15 +45,19 @@ function setup() {
     getplayerinformation()
     getplayerdeck()
     getplayersposition()
-}
+    }
 
   function updateME(){
-    CheckClick(mouseX,mouseY,100,100,100,100);
+    //CheckClick(mouseX,mouseY,100,100,100,100);
+    (selected_tile_id == player_tile) ? moving = true : null; 
+    (moving == true) ?  movement(selected_tile_id , player_tile , 1 , 4) : null
   }
 
   function draw() {
     scale(scalen)
-     draw_all_rect() ;
+    create_all_rect() ;
+    
+     draw_all_rect(); 
      draw_hud();
      //rect(100,100,100,100);
      //print('update')
@@ -50,26 +66,28 @@ function setup() {
     
 
      updateME();
-     
   } 
   
 
 
-function draw_all_rect(){ 
+function create_all_rect(){ 
     let position = 350
     let x_reposition = (9*60)/2 // number of columns * width / half of the whole square 
     if(i < 81){
         for (var h = 1 ; h < 10 ; h= h + 1){
             for (var l = 0 ; l < 9 ; l = l + 1){
-                rect((canvasx/2) - x_reposition + (l*60) , (canvasy/2)-position + (h*60), 60, 60)
+                //rect((canvasx/2) - x_reposition + (l*60) , (canvasy/2)-position + (h*60), 60, 60)
                 chessbuttons[i+1] ={
                             x:(canvasx/2) - x_reposition + (l*60),
                             y:(canvasy/2) - position + (h*60),
                             width: 60,
-                            height:60
+                            height:60,
+                            letter:h,
+                            number:l+1
                 }
                 i = i + 1 ;
-                text(i, (canvasx/2) - x_reposition + (l*60) +30 , (canvasy/2)-position + 60 + (h*60)-30 ); 
+                //rect(chessbuttons[i].x , chessbuttons[i].y, chessbuttons[i].width, chessbuttons[i].height)
+                //text(i, chessbuttons[i].x +30 , chessbuttons[i].y + 30 ); 
                 /* if (i > 81 ){
                     i=0;
                     noLoop();} */
@@ -78,9 +96,21 @@ function draw_all_rect(){
     }     
 } 
 
+function draw_all_rect(){ 
+    let chessbuttons_length = Object.keys(chessbuttons).length
+    for(let index = 1; index < chessbuttons_length +1 ; index++){
+    fill(255,255,255)
+    rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
+    fill(0,0,0)
+    textSize(15)
+    text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
+    }         
+} 
+
 function draw_hud(){ 
     //let roundinfo = cur_round + ' - ' + 'p1 attacking'
     // round number
+    fill(255, 255, 255)
     rect(canvasx*0.3 ,canvasy*0.05,canvasx*0.4,canvasy*0.07)
     textSize(45)
     fill(0, 0, 0)
@@ -108,6 +138,13 @@ function draw_hud(){
     text('Basic'+'\n'+'Attack',canvasx*0.08-((canvasx*0.08)/4),canvasy*0.7)
     fill(255, 255, 255)
 
+    //player token
+    fill(239, 87, 87)
+    circle(chessbuttons[player_tile].x + 30 ,chessbuttons[player_tile].y + 30,60,60)
+    //print(player_tile)
+    //enemy token 
+    fill(87, 135, 239)
+    circle(chessbuttons[enemy_tile].x + 30 ,chessbuttons[enemy_tile].y + 30,60,60)
 }
 
 
@@ -120,18 +157,44 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }
 
  function mousePressed(){
-    //print('MX' + mouseX ,'\n', 'MY'+ mouseY )
-    //print(chessbuttons)
+     print(chessbuttons)
+    print('player tile: '+ player_tile)
+    print('selected tile: '+ selected_tile_id)
     for (a=1 ; a <= 81; a++){
-        //print('uu')
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
-            print('index ' + selected_tile_id)
+            print('index '+selected_tile_id)  
+            print('changed selected')
             break
         }
     }
     
 } 
+
+function movement(selected , cur_place , range , type){
+    
+    if(type = 4){
+        print('movement called')
+        for (range = range +1 ; range > 0 ; range--){
+            if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
+             (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
+             (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
+                    player_tile = selected
+                    break 
+            }else if (((chessbuttons[selected].number == chessbuttons[cur_place].number + range) ||  
+            (chessbuttons[selected].number == chessbuttons[cur_place].number - range)) &&
+            (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
+                    player_tile = selected
+            }else {
+                moving = false
+                print('isnt moving') 
+            }
+        }
+
+    } 
+
+} 
+
 
 async function getBattleRound() {
     try {
@@ -226,8 +289,11 @@ async function getplayersposition() {
            playersposition = await response.json();
            if (users_num = 1) {
             player_tile = playersposition[0].player_tile_id
+            enemy_tile = playersposition[1].player_tile_id
+
            }else {
             player_tile = playersposition[1].player_tile_id
+            enemy_tile = playersposition[0].player_tile_id
            }
            print('players position '+ playersposition[0].player_tile_id);
            print('players position '+ playersposition[1].player_tile_id);
