@@ -220,3 +220,32 @@ app.get('/battle_states', async function( req, res) {
                 res.status(500).send(err);
               }
             })
+
+            app.post('/player_information_change/:playerid', async function( req, res) {
+              
+              let ply_health = req.body.ply_health;
+              let ply_mana = req.body.ply_mana;
+              let ply_total_mana = req.body.ply_total_mana;
+              let ply_energy = req.body.ply_energy;
+              let playerid = req.params.playerid;
+              let sql = 'select * from player where player_id = $1 ';
+      
+                try{
+                  let result = await pool.query(sql,[playerid]);
+                  if(result.rows.length > 0){
+                    sql = `UPDATE player
+                        player_mana = ${ply_mana},
+                        player_total_mana = ${ply_total_mana},
+                        player_health = ${ply_health} ,
+                        player_energy = ${ply_energy}
+
+                        WHERE player_id = $1`;
+                  }
+    
+                  result = await pool.query(sql,[playerid]);
+                  res.status(200).send({ms: "Inserted"});
+                } catch(err) {
+                  console.log(err);
+                  res.status(500).send(err);
+                }
+              })

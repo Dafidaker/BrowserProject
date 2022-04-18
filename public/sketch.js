@@ -9,7 +9,6 @@
   let canvasy
   let chessbuttons = {}
   let playerif = {mana: 0 , mana_total:0, health:20, energy:3}
-  let textsize
   let scalen  
   let selected_tile_id = 100 
   
@@ -32,7 +31,6 @@ function setup() {
     }
 
     scalen = (biggerside/1920)
-    textsize = ((canvasx*canvasy)*45)/1709290
     //scalen = 1
     let canvas = createCanvas(canvasx -25  , canvasy -25);
     canvas.parent('game');
@@ -109,7 +107,7 @@ function draw_all_rect(){
 
 function draw_hud(){ 
     //let roundinfo = cur_round + ' - ' + 'p1 attacking'
-    // round number
+    // round number and state 
     fill(255, 255, 255)
     rect(canvasx*0.3 ,canvasy*0.05,canvasx*0.4,canvasy*0.07)
     textSize(45)
@@ -141,7 +139,7 @@ function draw_hud(){
     //player token
     fill(239, 87, 87)
     circle(chessbuttons[player_tile].x + 30 ,chessbuttons[player_tile].y + 30,60,60)
-    //print(player_tile)
+    
     //enemy token 
     fill(87, 135, 239)
     circle(chessbuttons[enemy_tile].x + 30 ,chessbuttons[enemy_tile].y + 30,60,60)
