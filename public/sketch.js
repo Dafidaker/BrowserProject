@@ -49,6 +49,7 @@ function setup() {
     //CheckClick(mouseX,mouseY,100,100,100,100);
     (selected_tile_id == player_tile) ? moving = true : null; 
     (moving == true) ?  movement(selected_tile_id , player_tile , 1 , 4) : null
+    CheckMousePosition()
   }
 
   function draw() {
@@ -66,7 +67,20 @@ function setup() {
      updateME();
   } 
   
-
+  function CheckMousePosition(){
+    /* for (a=1 ; a <= 81; a++){
+        if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
+            selected_tile_id = a 
+            print('index ' + selected_tile_id)  
+            print('changed selected')
+            break
+        }
+     }*/  
+    CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)
+    if(mousePressed){
+        selected_tile_id = a 
+    }
+  }
 
 function create_all_rect(){ 
     let position = 350
@@ -84,14 +98,32 @@ function create_all_rect(){
                             number:l+1
                  }
                 i = i + 1 ;
-                //rect(chessbuttons[i].x , chessbuttons[i].y, chessbuttons[i].width, chessbuttons[i].height)
+                /*  //rect(chessbuttons[i].x , chessbuttons[i].y, chessbuttons[i].width, chessbuttons[i].height)
                 //text(i, chessbuttons[i].x +30 , chessbuttons[i].y + 30 ); 
-                /* if (i > 81 ){
+                     if (i > 81 ){
                     i=0;
-                    noLoop();} */
+                    noLoop();} */ 
             }
         }  
-    }     
+    }
+    /*let position = 350
+    let x_reposition = (9*60)/2 // number of columns * width / half of the whole square
+    if (i < 81){
+        for (x = 0; x < 9; x ++){
+            for (y = 0; y < 9; y ++){
+                chessbuttons[i+1] ={
+                    x:(canvasx/2) - x_reposition + (l*60),
+                    y:(canvasy/2) - position + (h*60),
+                    width: 60,
+                    height: 60,
+                    letter: h,
+                    number: l + 1
+                }
+                i = i + 1;
+            }
+        }
+    }
+    */
 } 
 
 function draw_all_rect(){ 
@@ -99,7 +131,12 @@ function draw_all_rect(){
     for(let index = 1; index < chessbuttons_length +1 ; index++){
     fill(255,255,255)
     rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
-    fill(0,0,0)
+    var isOffset = (chessbuttons[index].x % 2 == 0 && chessbuttons[index].y % 2 != 0) || (chessbuttons[index].x % 2 != 0 && chessbuttons[index].y % 2 == 0)
+    if (isOffset = true){
+        fill(0,0,0)
+    } else {
+        fill(255, 255, 255)
+    }
     textSize(15)
     text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
     }         
@@ -107,32 +144,30 @@ function draw_all_rect(){
 
 function draw_hud(){ 
     //let roundinfo = cur_round + ' - ' + 'p1 attacking'
-    // round number and state 
+
     fill(255, 255, 255)
-    rect(canvasx*0.3 ,canvasy*0.05,canvasx*0.4,canvasy*0.07)
+    rect(canvasx * 0.3 ,canvasy * 0.05,canvasx * 0.4,canvasy * 0.07)
     textSize(45)
     fill(0, 0, 0)
-    text(cur_round,(canvasx/2)-(textWidth(cur_round)/2) ,canvasy*0.07 + (canvasy*0.07/2))
+    text(cur_round,(canvasx/2)-(textWidth(cur_round)/2) ,canvasy * 0.07 + (canvasy * 0.07/2))
 
     // player information 
     fill(255,255,255)
-    rect((canvasx*0.8) ,(canvasy*0.79),(canvasx*0.18),(canvasy*0.18))
+    rect((canvasx * 0.8) ,(canvasy * 0.79),(canvasx * 0.18),(canvasy * 0.18))
     textSize(30)
     fill(0, 153, 15)
-    text('HEALTH : ' + playerif.health + ' /20',(canvasx*0.8) +10 ,(canvasy*0.84) )
+    text('HEALTH : ' + playerif.health + ' /20',(canvasx * 0.8) +10 ,(canvasy * 0.84) )
     fill(0, 175, 235)
-    text('MANA : ' + playerif.mana + '/' + playerif.mana_total,(canvasx*0.8) +10 ,(canvasy*0.89) )
+    text('MANA : ' + playerif.mana + '/' + playerif.mana_total,(canvasx * 0.8) +10 ,(canvasy * 0.89) )
     fill(228, 164, 7)
-    text('ENERGY : ' + playerif.energy +' /3',(canvasx*0.8) +10 ,(canvasy*0.94) )
-
-    //text(playerinfo[0].player_mana,(canvasx*0.8) +10 ,(canvasy*0.8) +30) 
+    text('ENERGY : ' + playerif.energy +' /3',(canvasx * 0.8) +10 ,(canvasy * 0.94) )
     
     //buttons
     fill(255, 255, 255)
-    circle(canvasx*0.2,canvasy*0.8,canvasx*0.08)
+    circle(canvasx *0.2,canvasy*0.8,canvasx*0.08)
     circle(canvasx*0.08,canvasy*0.7,canvasx*0.08)
     fill(0, 0, 0)
-    text('Get'+'\n'+'  a'+'\n'+'Card',canvasx*0.2-((canvasx*0.08)/4),canvasy*0.8)
+    //text('Get'+'\n'+'  a'+'\n'+'Card',canvasx*0.2-((canvasx*0.08)/4),canvasy*0.8)
     text('Basic'+'\n'+'Attack',canvasx*0.08-((canvasx*0.08)/4),canvasy*0.7)
     fill(255, 255, 255)
 
@@ -147,27 +182,27 @@ function draw_hud(){
 
 
 function CheckClick(x,y,x1,y1,w1,h1){
-    if((x >= x1*scalen) && (x <=  (x1 + w1)*scalen)){
-        if((y >= y1*scalen) && (y <= (y1 + h1)*scalen)){
+    if((x >= x1 * scalen) && (x <=  (x1 + w1) * scalen)){
+        if((y >= y1 * scalen) && (y <= (y1 + h1) * scalen)){
         return true  
         }
     } 
 }
 
- function mousePressed(){
-     print(chessbuttons)
+ /* function mousePressed(){
+    print(chessbuttons)
     print('player tile: '+ player_tile)
     print('selected tile: '+ selected_tile_id)
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
-            print('index '+selected_tile_id)  
+            print('index ' + selected_tile_id)  
             print('changed selected')
             break
         }
     }
     
-} 
+}  */
 
 function movement(selected , cur_place , range , type){
     
