@@ -227,7 +227,7 @@ app.get('/battle_states', async function( req, res) {
               let ply_mana = req.body.ply_mana;
               let ply_total_mana = req.body.ply_total_mana;
               let ply_energy = req.body.ply_energy;
-      
+              
                 try{
                   sql = `UPDATE player
                         SET player_mana = ${ply_mana},
@@ -247,8 +247,8 @@ app.get('/battle_states', async function( req, res) {
                         WHERE player_id = 1`;
                   } */
     
-                  let result1 = await pool.query(sql);
-                  print(result1)
+                  let result = await pool.query(sql);
+                  print(result)
                   res.status(200).send({ms: "Inserted"});
                 } catch(err) {
                   console.log(err);
