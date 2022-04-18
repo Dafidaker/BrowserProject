@@ -84,7 +84,7 @@ function create_all_rect(){
                             height:60,
                             letter:h,
                             number:l+1
-                }
+                 }
                 i = i + 1 ;
                 //rect(chessbuttons[i].x , chessbuttons[i].y, chessbuttons[i].width, chessbuttons[i].height)
                 //text(i, chessbuttons[i].x +30 , chessbuttons[i].y + 30 ); 
@@ -187,7 +187,7 @@ function movement(selected , cur_place , range , type){
                     player_tile = selected
             }else {
                 moving = false
-                print('isnt moving') 
+                print('isnt moving  ') 
             }
         }
 
