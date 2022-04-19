@@ -50,7 +50,7 @@ function setup() {
     //CheckClick(mouseX,mouseY,100,100,100,100);
     (selected_tile_id == player_tile) ? moving = true : null; 
     (moving == true) ?  movement(selected_tile_id , player_tile , 1 , 4) : null
-    CheckMousePosition()
+    //CheckMousePosition()
   }
 
   function draw() {
@@ -190,10 +190,11 @@ function CheckClick(x,y,x1,y1,w1,h1){
     } 
 }
 
- /* function mousePressed(){
+  function mousePressed(){
     print(chessbuttons)
     print('player tile: '+ player_tile)
     print('selected tile: '+ selected_tile_id)
+    ChangePlayerInfo(1,2,2,2,2)
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
@@ -203,7 +204,7 @@ function CheckClick(x,y,x1,y1,w1,h1){
         }
     }
     
-}  */
+}  
 
 function movement(selected , cur_place , range , type){
     
@@ -298,16 +299,16 @@ async function MakeDeck() {
     }
 }
 
-async function ChangePlayerInfo(plyId,ply_health,ply_total_mana,ply_mana) {
+async function ChangePlayerInfo(id,health,total_mana,mana,energy) {
     try {
-        let player_id
-        const response = await fetch(`/player_information_change/${player_id}`,
+        
+        const response = await fetch('/player_information_change',
         {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
               },
-            body: JSON.stringify({ plyId: plyId, ply_health: ply_health, ply_total_mana: ply_total_mana, ply_mana: ply_mana,ply_energy: ply_energy }) 
+            body: JSON.stringify({ plyId: id, ply_health: health, ply_total_mana: total_mana, ply_mana: mana,ply_energy: energy }) 
         });
         if (response.status == 200) {
            var  result= await response.json();
