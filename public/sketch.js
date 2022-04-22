@@ -308,7 +308,7 @@ async function ChangePlayerInfo(id,health,total_mana,mana,energy) {
             headers: {
                 "Content-Type": "application/json"
               },
-            body: JSON.stringify({ plyId: id, ply_health: health, ply_total_mana: total_mana, ply_mana: mana,ply_energy: energy }) 
+            body: JSON.stringify({ ply_Id: id, ply_health: health, ply_total_mana: total_mana, ply_mana: mana,ply_energy: energy }) 
         });
         if (response.status == 200) {
            var  result= await response.json();
