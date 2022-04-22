@@ -1,6 +1,6 @@
 //const { text } = require("body-parser");
 
-  var i = 0;
+  var i = 1;
   var battleRound;
   var playerinfo;
   var playerdeck;
@@ -18,8 +18,16 @@ let enemy_tile = 2
 let users_num = 1
 let moving = false 
 
+//States
+var GameState = BasicState
+var BasicState = 0
+var MyRoundState = 1
+    var MovingState = 1.1
+    var PlayingCardState = 1.2
+var EnemyState = 2
 
 function setup() {
+    //Create canvas
     canvasx = windowWidth 
     canvasy = windowHeight 
     var biggerside = Math.max(canvasx,canvasy)
@@ -29,43 +37,91 @@ function setup() {
     }else {
         ((biggerside /2)> canvasx) ? canvasx = canvasx : canvasx = biggerside /2
     }
-
     scalen = (biggerside/1920)
-    //scalen = 1
     let canvas = createCanvas(canvasx -25  , canvasy -25);
     canvas.parent('game');
+
+    //Get information from database 
     gamestart();
+
+    //creates the squares for the board
+    create_all_rect()
+
+    //Define color of backround
     background(233, 225, 206);
   }
 
   function gamestart() {
-    getBattleRound()
-    getplayerinformation()
-    getplayerdeck()
-    getplayersposition()
-    
+    getBattleRound() //Gets the round number and state as a nice string
+    getplayerinformation() // gets all the information from one player , 
+    getplayerdeck() // gets the deck from one player 
+    getplayersposition() // gets position from both players 
     }
 
   function updateME(){
     //CheckClick(mouseX,mouseY,100,100,100,100);
-    (selected_tile_id == player_tile) ? moving = true : null; 
-    (moving == true) ?  movement(selected_tile_id , player_tile , 1 , 4) : null
+    if(GameState == BasicState){
+
+
+
+    }else if(GameState == MyRoundState){
+
+        (selected_tile_id == player_tile) ? GameState = MovingState : null
+
+    }else if(GameState == MovingState){
+        
+        movement(selected_tile_id , player_tile , 1 , 4)
+
+    }else if(GameState == PlayingCardState){
+
+
+    }else if(GameState == EnemyState){
+
+
+    }else{
+
+
+
+    }
     //CheckMousePosition()
   }
 
   function draw() {
+    //scales the drawin//
     scale(scalen)
-    create_all_rect() ;
-    
-     draw_all_rect(); 
-     draw_hud();
-     //rect(100,100,100,100);
-     //print('update')
-    /* text(mouseX,50,50)
-    text(mouseY,50,70) */
-    
 
-     updateME();
+    //Always
+        //drawing the board
+        //create_all_rect() ;
+        draw_all_rect(); 
+
+        ///drawing the hud
+        draw_hud();
+
+        if(GameState == BasicState){
+
+
+
+        }else if(GameState == MyRoundState){
+
+            (selected_tile_id == player_tile) ? GameState = MovingState : null
+
+        }else if(GameState == MovingState){
+            
+            movement(selected_tile_id , player_tile , 1 , 4)
+
+        }else if(GameState == PlayingCardState){
+
+
+        }else if(GameState == EnemyState){
+
+
+        }else{
+
+        }
+///////////////////////////////////////////////////
+    //Update function//
+        updateME();
   } 
   
   function CheckMousePosition(){
@@ -77,75 +133,59 @@ function setup() {
             break
         }
      }*/  
-    CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)
-    if(mousePressed){
-        selected_tile_id = a 
+    if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
+        if(mousePressed){
+            selected_tile_id = a 
+        }    
     }
+    
   }
 
 function create_all_rect(){ 
-    let position = 350
-    let x_reposition = (9*60)/2 // number of columns * width / half of the whole square 
-    if(i < 81){
-        for (var h = 1 ; h < 10 ; h= h + 1){
-            for (var l = 0 ; l < 9 ; l = l + 1){
-                //rect((canvasx/2) - x_reposition + (l*60) , (canvasy/2)-position + (h*60), 60, 60)
-                chessbuttons[i+1] ={
-                            x:(canvasx/2) - x_reposition + (l*60),
-                            y:(canvasy/2) - position + (h*60),
-                            width: 60,
-                            height:60,
-                            letter:h,
-                            number:l+1
-                 }
+    let position = 350  
+    let x_reposition = ((9*60)/2)+60 // number of columns * width / half of the whole square 
+    if(i < 82){
+        for (var r = 1 ; r < 10 ; r= r + 1){
+            for (var c = 1 ; c < 10 ; c = c + 1){
+
+                chessbuttons[i] ={
+                    x:(canvasx/2) - x_reposition + (c*60),
+                    y:(canvasy/2) - position + (r*60),
+                    width: 60,
+                    height:60,
+                    letter:r,
+                    number:c+1
+                }
+
                 i = i + 1 ;
-                /*  //rect(chessbuttons[i].x , chessbuttons[i].y, chessbuttons[i].width, chessbuttons[i].height)
-                //text(i, chessbuttons[i].x +30 , chessbuttons[i].y + 30 ); 
-                     if (i > 81 ){
-                    i=0;
-                    noLoop();} */ 
+
             }
         }  
     }
-    /*let position = 350
-    let x_reposition = (9*60)/2 // number of columns * width / half of the whole square
-    if (i < 81){
-        for (x = 0; x < 9; x ++){
-            for (y = 0; y < 9; y ++){
-                chessbuttons[i+1] ={
-                    x:(canvasx/2) - x_reposition + (l*60),
-                    y:(canvasy/2) - position + (h*60),
-                    width: 60,
-                    height: 60,
-                    letter: h,
-                    number: l + 1
-                }
-                i = i + 1;
-            }
-        }
-    }
-    */
 } 
 
 function draw_all_rect(){ 
     let chessbuttons_length = Object.keys(chessbuttons).length
     for(let index = 1; index < chessbuttons_length +1 ; index++){
-    fill(255,255,255)
-    rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
-    var isOffset = (chessbuttons[index].x % 2 == 0 && chessbuttons[index].y % 2 != 0) || (chessbuttons[index].x % 2 != 0 && chessbuttons[index].y % 2 == 0)
-    if (isOffset = true){
-        fill(0,0,0)
-    } else {
-        fill(255, 255, 255)
-    }
     textSize(15)
-    text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
+        if (index % 2 == 0){
+            fill(0,0,0)
+            rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
+            fill(127, 101, 57)
+            text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
+
+        } else {
+            fill(0,0,0)
+            text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 );
+            fill(127, 101, 57)
+            rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
+    
+        }
     }         
 } 
 
 function draw_hud(){ 
-    //let roundinfo = cur_round + ' - ' + 'p1 attacking'
-
+    //Drawing the round num and round state
     fill(255, 255, 255)
     rect(canvasx * 0.3 ,canvasy * 0.05,canvasx * 0.4,canvasy * 0.07)
     textSize(45)
@@ -163,7 +203,7 @@ function draw_hud(){
     fill(228, 164, 7)
     text('ENERGY : ' + playerif.energy +' /3',(canvasx * 0.8) +10 ,(canvasy * 0.94) )
     
-    //buttons
+    //buttons(Basic attack)(Get a card)
     fill(255, 255, 255)
     circle(canvasx *0.2,canvasy*0.8,canvasx*0.08)
     circle(canvasx*0.08,canvasy*0.7,canvasx*0.08)
@@ -191,18 +231,19 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }
 
   function mousePressed(){
-    print(chessbuttons)
+    //print(chessbuttons)
+    //ChangePlayerInfo(1,2,2,2,2)
+
     print('player tile: '+ player_tile)
     print('selected tile: '+ selected_tile_id)
-    ChangePlayerInfo(1,2,2,2,2)
+
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
             print('index ' + selected_tile_id)  
-            print('changed selected')
             break
         }
-    }
+    } 
     
 }  
 
@@ -365,3 +406,27 @@ async function getplayersposition() {
         console.log(err);
     }
 } 
+
+async function ChangePlayerPosition(id,position) {
+    try {
+        
+        const response = await fetch('/player_location_change',
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify({ply_id: id, player_tile: position}) 
+        });
+        if (response.status == 200) {
+           var  result= await response.json();
+           print(result);
+        } else {
+            // Treat errors like 404 here
+            console.log(response);
+        }
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+    }
+}
