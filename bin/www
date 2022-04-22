@@ -230,8 +230,10 @@ app.get('/battle_states', async function( req, res) {
               let ply_id = req.body.ply_id
                 try{
                   sql = `UPDATE player
-                        SET player_mana = ${ply_mana}
-                        
+                        SET player_mana = ${ply_mana},
+                        player_total_mana = ${ply_total_mana},
+                        player_health = ${ply_health} ,
+                        player_energy = ${ply_energy}
 
                         WHERE player_id = ${ply_id}`;
     
