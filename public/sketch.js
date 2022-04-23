@@ -1,6 +1,5 @@
 //const { text } = require("body-parser");
 
-//const { text } = require("body-parser");
 var player_id = 1   
 var playerdk = {}
 let playerif = {mana: 0 , mana_total:0, health:20, energy:3 , num : 1}
@@ -10,6 +9,8 @@ let selected_tile_id = 100
 let player_tile = 2
 let enemy_tile = 2
 let users_num = 1
+
+var CardSelect_index
 
 var i = 1;
 
@@ -25,6 +26,12 @@ let scalen
 
 let canvasx
 let canvasy
+var BackgroundColor = [224, 221, 214];
+console.log(BackgroundColor)
+var grid
+
+var clickingboard = false 
+var clickingcards = false
 
 //States
 var GameState = 1
@@ -60,8 +67,6 @@ function setup() {
     //creates the squares for the board
     create_all_rect()
 
-    //Define color of backround
-    background(233, 225, 206);
 }
 
 function SetInicialState() {
@@ -71,7 +76,7 @@ function SetInicialState() {
     ChangeCardState(1,3,1)  // (id,card,newstate)
 
     ChangePlayerInfo(2,20,3,3,3) //(id,health,total_mana,mana,energy)
-    ChangePlayerPosition(2,39) // (id,position)
+    ChangePlayerPosition(2,40) // (id,position)
     ChangeCardState(2,2,1)  // (id,card,newstate)
     ChangeCardState(2,20,1)  // (id,card,newstate)
 }
@@ -84,15 +89,15 @@ function InicialInformation() {
 }
 
 function create_all_rect(){ 
-    let position = 350  
-    let x_reposition = ((9*60)/2)+60 // number of columns * width / half of the whole square 
+    let YOffSet = 400 
+    let XOffSet = ((9*60)/2)+60 // number of columns * width / half of the whole square 
     if(i < 82){
         for (var r = 1 ; r < 10 ; r= r + 1){
             for (var c = 1 ; c < 10 ; c = c + 1){
 
                 chessbuttons[i] ={
-                    x:(canvasx/2) - x_reposition + (c*60),
-                    y:(canvasy/2) - position + (r*60),
+                    x:(canvasx/2) - XOffSet + (c*60),
+                    y:(canvasy/2) - YOffSet + (r*60),
                     width: 60,
                     height:60,
                     letter:r,
@@ -107,35 +112,63 @@ function create_all_rect(){
 }
 
 ///////////////////////////////////DRAW//////////////////////////////////////////
+function DrawGrid(){
+    if(grid == true){
+        for(r = 0.0 ; r < 1 ; r += 0.1){
+            line(0, canvasy*r , canvasx , canvasy*r)
+        }
+        for(c = 0.0 ; c < 1 ; c += 0.1){
+            line(canvasx*c, 0 , canvasx*c , canvasy)
+        }
+    }
+}
+
 function draw() {
+    //Define color of backround
+    background(BackgroundColor);
     //scales the drawin//
+    fill(0,0,0)
+    textSize(25)
+    text(mouseX,10,50)
+    text(mouseY,10,100)
+    text('Board: ' + clickingboard,10,150)
+    text('Cards: ' + clickingcards,10,200)
+    
+
     scale(scalen)
 
     //Always
+        DrawGrid();
         //drawing the board
-        //create_all_rect() ;
         draw_all_rect(); 
 
         ///drawing the hud
         draw_hud();
 
+        /// draw ur cards
+        DrawAllCards();
+        
+
         if(GameState == BasicState){
 
-
+            BackgroundColor = [224, 221, 214]    // grey    
 
         }else if(GameState == MyRoundState){
+            BackgroundColor = [233, 225, 206]; //beige
 
-            (selected_tile_id == player_tile) ? GameState = MovingState : null
+            //(selected_tile_id == player_tile) ? GameState = MovingState : null
 
         }else if(GameState == MovingState){
-            
-            movement(selected_tile_id , player_tile , 1 , 4)
+            BackgroundColor = [206, 219, 233] //blue
+           // movement(selected_tile_id , player_tile , 1 , 4)
 
+        
         }else if(GameState == PlayingCardState){
-
+            BackgroundColor = [233, 206, 207] //red
+            
 
         }else if(GameState == EnemyState){
-
+            BackgroundColor = [179, 152, 86] //dark beige
 
         }else{
 
@@ -156,11 +189,10 @@ function draw_all_rect(){
             text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
 
         } else {
-            fill(0,0,0)
-            text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 );
             fill(127, 101, 57)
             rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
-    
+            fill(0,0,0)
+            text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 );
         }
     }         
 } 
@@ -208,6 +240,43 @@ function draw_hud(){
     text(GameState,canvasx*0.8,canvasy*0.5)
 }
 
+function DrawAllCards(){
+    let MaxCardsOnHand = 2
+    let SpaceBetweenCards = 40 
+    let HandSpace = canvasx*0.7 - canvas*0.2
+    let HandSpaceAvaliable = HandSpace -( SpaceBetweenCards *(MaxCardsOnHand-1))
+
+    let width = 120
+    let height = 170
+    for(i= 0 ; i < (Object.keys(playerdk).length - 1) ; i++){
+        if(playerdk[i].card_state_id == 1 ){
+            fill(0,0,0)
+            
+            let NegativeX = canvasx*0.5  - (width*i) - (height/2) - (SpaceBetweenCards/2)
+            playerdk[i].x = NegativeX
+            playerdk[i].y = canvasy*0.8
+            playerdk[i].width = 120
+            playerdk[i].height = 170
+            rect(playerdk[i].x,playerdk[i].y,width,height)
+            
+
+            let PositiveX = canvasx*0.5  + (width*i) + (height/2) + (SpaceBetweenCards/2)
+            playerdk[i+1].x = PositiveX
+            playerdk[i+1].y = canvasy*0.8
+            playerdk[i+1].width = 120
+            playerdk[i+1].height = 170
+            rect(playerdk[i+1].x,playerdk[i+1].y,width,height)
+            
+            textSize(15)
+            fill(255,255,255)
+            text(playerdk[i].card_name,playerdk[i].x ,playerdk[i].y+(height/2) )
+            text(playerdk[i+1].card_name,playerdk[i+1].x,playerdk[i+1].y +(height/2) )
+
+        }
+    }
+}
+
+
 
 ///////////////////////////////////UPDATE///////////////////////////////////////////
 function updateME(){
@@ -218,7 +287,7 @@ function updateME(){
 
     }else if(GameState == MyRoundState){
 
-        (selected_tile_id == player_tile) ? GameState = MovingState : null
+        //(selected_tile_id == player_tile) ? GameState = MovingState : null
 
     }else if(GameState == MovingState){
 
@@ -240,7 +309,6 @@ function updateME(){
 }
 
 
-
 //////////////////////////////////MOUSE///////////////////////////////////////////////////
 function CheckClick(x,y,x1,y1,w1,h1){
     if((x >= x1 * scalen) && (x <=  (x1 + w1) * scalen)){
@@ -251,27 +319,47 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }
 
 function mousePressed(){
-    //print(chessbuttons)
-    //ChangePlayerInfo(1,2,2,2,2)
-    //print('player tile: '+ player_tile)
-    //print('selected tile: '+ selected_tile_id)
-    
+   
+    //Movement
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
-            print('index ' + selected_tile_id)  
+            print('index ' + selected_tile_id) ;
+            (selected_tile_id == player_tile)? GameState = MovingState : null ;
+            clickingboard = true
             break
+        }else{
+            clickingboard = false
         }
     }
+    
     movement(selected_tile_id , player_tile , 1 , 4) 
     
+    // playing card 
+    for(i = 0 ; i <  Object.keys(playerdk).length  ; i++){
+        print('TIME')
+        if(CheckClick(mouseX,mouseY,playerdk[i].x,playerdk[i].y,playerdk[i].width,playerdk[i].height)){
+            CardSelect_index = i
+            print('card select ' + CardSelect_index)  
+            GameState = PlayingCardState
+            clickingcards = true
+            break
+        }else{
+            clickingcards = false
+        }
+    }
+    
+    //if not cliking on board or cards goes back to roundstate
+    if (clickingcards == false && clickingboard == false){
+        GameState = MyRoundState
+    }
+   
 }  
 
 function movement(selected , cur_place , range , type){
     if(type == 4 && GameState == 1.1){
         if(selected<82 && selected>0 && playerif.energy>0 && selected != enemy_tile  ){
             for (range = range ; range > 0 ; range--){
-                print('being called')
                 if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
                 (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
                 (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
@@ -299,6 +387,14 @@ function movement(selected , cur_place , range , type){
         };
     } 
 } 
+
+
+function keyPressed() {
+    print('0')
+    if (keyCode === LEFT_ARROW ) {
+        (grid == true)? grid = false : grid = true ;
+    }
+}
 
 
 ////////////////////////////////ENDPOINTS/////////////////////////////////////////////
@@ -396,16 +492,19 @@ async function getplayerdeck() {
         let playerid = 1;
         const response = await fetch(`/get_deck/${playerid}`);
         if (response.status == 200) {
-           var playerdeck= await response.json();
-           print(playerdeck);
-           print(playerdeck.length)
+           var playerdeck = await response.json();
+           //print(playerdeck);
+           //print(playerdeck.length)
            for(i = 0; i < playerdeck.length; i++){
                 playerdk[i] = {
                     card_id: playerdeck[i].deck_card_id,
-                    card_name : playerdeck[i].card_name
+                    card_name : playerdeck[i].card_name,
+                    card_state_id: playerdeck[i].deck_card_state_id
+                    
                 }
            }
-           print('num of cards per deck' + Object.keys(playerdk).length)
+           print(playerdk)
+           //print('num of cards per deck' + Object.keys(playerdk).length)
         } else {
             // Treat errors like 404 here
             console.log(response);
