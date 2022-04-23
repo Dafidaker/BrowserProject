@@ -1,12 +1,12 @@
 //const { text } = require("body-parser");
 
 //const { text } = require("body-parser");
-
+  var player_id = 1   
   var i = 1;
   var battleRound;
   var playerinfo;
   var playerdeck;
-  var cur_round = 'aaaa';
+  var cur_round = '[Waiting for information ...]';
   let canvasx
   let canvasy
   let chessbuttons = {}
@@ -242,32 +242,36 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }  
 
 function movement(selected , cur_place , range , type){
-    if(type = 4){
-        //print('movement called')
-        /* print(chessbuttons[selected].letter)
-        print(chessbuttons[cur_place].letter)  */
-        if(selected<82 && selected>0 && GameState == 1.1){
+    if(type = 4 && GameState == 1.1){
+        if(selected<82 && selected>0 && playerif.energy>0 && selected != enemy_tile  ){
             for (range = range ; range > 0 ; range--){
-                /* print('selected: ' + chessbuttons[selected].letter + 
-                '\n' + 'above : ' + (chessbuttons[cur_place].letter + range) + 
-                '\n' + 'below : ' + (chessbuttons[cur_place].letter - range) + 
-                '\n' + 'right: ' + (chessbuttons[cur_place].number + range) + 
-                '\n' + 'left: ' + (chessbuttons[cur_place].number - range) + '\n'   ) */
                 print('being called')
                 if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
                 (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
                 (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
                         player_tile = selected
+                        playerif.energy -=1
                         break 
                 }else if (((chessbuttons[selected].number == chessbuttons[cur_place].number + range) ||  
                 (chessbuttons[selected].number == chessbuttons[cur_place].number - range)) &&
                 (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
                         player_tile = selected
+                        playerif.energy -=1
                         break
                 }
             }
-        }else{}
-        (player_tile == selected) ? null : GameState = 1;
+        };
+
+        if(player_tile != selected){
+            GameState = 1
+            ChangePlayerPosition(player_id,player_tile)
+            ChangePlayerInfo(player_id,
+                playerif.health,
+                playerif.mana_total,
+                playerif.mana,
+                playerif.energy)
+        };
+
     } 
 
 } 
