@@ -262,7 +262,7 @@ app.post('/player_location_change', async function( req, res) {
     }
 }) 
 
-app.post('/deck_card_change_state', async function( req, res) {
+app.post('/deck_card_state_change', async function( req, res) {
   let card_state_id = req.body.card_state_id;
   let card_id = req.body.card_id;
   let ply_id = req.body.ply_id
