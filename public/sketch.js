@@ -1,5 +1,7 @@
 //const { text } = require("body-parser");
 
+//const { text } = require("body-parser");
+
   var i = 1;
   var battleRound;
   var playerinfo;
@@ -19,7 +21,7 @@ let users_num = 1
 let moving = false 
 
 //States
-var GameState = BasicState
+var GameState = 1
 var BasicState = 0
 var MyRoundState = 1
     var MovingState = 1.1
@@ -69,8 +71,9 @@ function setup() {
         (selected_tile_id == player_tile) ? GameState = MovingState : null
 
     }else if(GameState == MovingState){
+
         
-        movement(selected_tile_id , player_tile , 1 , 4)
+        //movement(selected_tile_id , player_tile , 1 , 4)
 
     }else if(GameState == PlayingCardState){
 
@@ -124,22 +127,7 @@ function setup() {
         updateME();
   } 
   
-  function CheckMousePosition(){
-    /* for (a=1 ; a <= 81; a++){
-        if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
-            selected_tile_id = a 
-            print('index ' + selected_tile_id)  
-            print('changed selected')
-            break
-        }
-     }*/  
-    if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
-        if(mousePressed){
-            selected_tile_id = a 
-        }    
-    }
-    
-  }
+  
 
 function create_all_rect(){ 
     let position = 350  
@@ -214,11 +202,17 @@ function draw_hud(){
 
     //player token
     fill(239, 87, 87)
-    circle(chessbuttons[player_tile].x + 30 ,chessbuttons[player_tile].y + 30,60,60)
+    if(GameState == MovingState){fill(200, 20, 20)}
+    circle(chessbuttons[player_tile].x + 30 ,chessbuttons[player_tile].y + 30,60)
     
     //enemy token 
     fill(87, 135, 239)
-    circle(chessbuttons[enemy_tile].x + 30 ,chessbuttons[enemy_tile].y + 30,60,60)
+    circle(chessbuttons[enemy_tile].x + 30 ,chessbuttons[enemy_tile].y + 30,60)
+
+    //GameState
+    fill(0,0,0)
+    textSize(30)
+    text(GameState,canvasx*0.8,canvasy*0.5)
 }
 
 
@@ -233,10 +227,9 @@ function CheckClick(x,y,x1,y1,w1,h1){
   function mousePressed(){
     //print(chessbuttons)
     //ChangePlayerInfo(1,2,2,2,2)
-
-    print('player tile: '+ player_tile)
-    print('selected tile: '+ selected_tile_id)
-
+    //print('player tile: '+ player_tile)
+    //print('selected tile: '+ selected_tile_id)
+    movement(selected_tile_id , player_tile , 1 , 4)
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
@@ -248,25 +241,34 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }  
 
 function movement(selected , cur_place , range , type){
-    
     if(type = 4){
-        print('movement called')
-        for (range = range +1 ; range > 0 ; range--){
-            if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
-             (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
-             (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
-                    player_tile = selected
-                    break 
-            }else if (((chessbuttons[selected].number == chessbuttons[cur_place].number + range) ||  
-            (chessbuttons[selected].number == chessbuttons[cur_place].number - range)) &&
-            (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
-                    player_tile = selected
-            }else {
-                moving = false
-                print('isnt moving  ') 
+        //print('movement called')
+        /* print(chessbuttons[selected].letter)
+        print(chessbuttons[cur_place].letter)  */
+        if(selected<82 && selected>0 && GameState == 1.1){
+            for (range = range +1; range > 0 ; range--){
+                /* print('selected: ' + chessbuttons[selected].letter + 
+                '\n' + 'above : ' + (chessbuttons[cur_place].letter + range) + 
+                '\n' + 'below : ' + (chessbuttons[cur_place].letter - range) + 
+                '\n' + 'right: ' + (chessbuttons[cur_place].number + range) + 
+                '\n' + 'left: ' + (chessbuttons[cur_place].number - range) + '\n'   ) */
+                print('being called')
+                if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
+                (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
+                (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
+                        player_tile = selected
+                        break 
+                }else if (((chessbuttons[selected].number == chessbuttons[cur_place].number + range) ||  
+                (chessbuttons[selected].number == chessbuttons[cur_place].number - range)) &&
+                (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
+                        player_tile = selected
+                        break
+                }else {
+                    GameState = MyRoundState
+                    //print('isnt moving') 
+                }
             }
-        }
-
+        }else{}
     } 
 
 } 
@@ -288,8 +290,6 @@ async function getBattleRound() {
         console.log(err);
     }
 }   
-
-
 
 async function getplayerinformation() {
     try {

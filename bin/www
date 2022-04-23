@@ -261,3 +261,21 @@ app.post('/player_location_change', async function( req, res) {
       res.status(500).send(err);
     }
 }) 
+
+app.post('/deck_card_change_state', async function( req, res) {
+  let card_state_id = req.body.card_state_id;
+  let card_id = req.body.card_id;
+  let ply_id = req.body.ply_id
+    try{
+      sql = `UPDATE dek
+            SET deck_card_state_id = ${card_state_id}
+            WHERE deck_player_id = ${ply_id} and deck_card_id = ${card_id}`;
+
+      let result = await pool.query(sql);
+      console.log(result.rows);
+      res.status(200).send({ms: "Position Inserted"});
+    } catch(err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+}) 
