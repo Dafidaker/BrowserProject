@@ -267,7 +267,7 @@ app.post('/deck_card_state_change', async function( req, res) {
   let card_id = req.body.card_id;
   let ply_id = req.body.ply_id
     try{
-      sql = `UPDATE dek
+      sql = `UPDATE deck
             SET deck_card_state_id = ${card_state_id}
             WHERE deck_player_id = ${ply_id} and deck_card_id = ${card_id}`;
 
