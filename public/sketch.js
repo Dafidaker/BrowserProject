@@ -10,7 +10,7 @@
   let canvasx
   let canvasy
   let chessbuttons = {}
-  let playerif = {mana: 0 , mana_total:0, health:20, energy:3}
+  let playerif = {mana: 0 , mana_total:0, health:20, energy:3 , num : 1}
   let scalen  
   let selected_tile_id = 100 
   
@@ -29,6 +29,7 @@ var MyRoundState = 1
 var EnemyState = 2
 
 function setup() {
+
     //Create canvas
     canvasx = windowWidth 
     canvasy = windowHeight 
@@ -43,24 +44,40 @@ function setup() {
     let canvas = createCanvas(canvasx -25  , canvasy -25);
     canvas.parent('game');
 
+    //Updates the database ( with the state we want)
+    SetInicialState()
+
     //Get information from database 
-    gamestart();
+    InicialInformation();
 
     //creates the squares for the board
     create_all_rect()
 
     //Define color of backround
     background(233, 225, 206);
-  }
+}
 
-  function gamestart() {
+
+function SetInicialState() {
+    ChangePlayerInfo(1,18,4,3,3) //(id,health,total_mana,mana,energy)
+    ChangePlayerPosition(1,59) // (id,position)
+    ChangeCardState(1,1,1)  // (id,card,newstate)
+    ChangeCardState(1,3,1)  // (id,card,newstate)
+
+    ChangePlayerInfo(2,20,3,3,3) //(id,health,total_mana,mana,energy)
+    ChangePlayerPosition(2,39) // (id,position)
+    ChangeCardState(2,2,1)  // (id,card,newstate)
+    ChangeCardState(2,20,1)  // (id,card,newstate)
+}
+
+function InicialInformation() {
     getBattleRound() //Gets the round number and state as a nice string
     getplayerinformation() // gets all the information from one player , 
     getplayerdeck() // gets the deck from one player 
     getplayersposition() // gets position from both players 
-    }
-
-  function updateME(){
+}
+  
+function updateME(){
     //CheckClick(mouseX,mouseY,100,100,100,100);
     if(GameState == BasicState){
 
@@ -298,13 +315,12 @@ async function getplayerinformation() {
         const response = await fetch(`/player_info/${playerid}`);
         if (response.status == 200) {
            var playerinfo = await response.json();
-           print('mana :' + (playerinfo[0].player_mana));
-           print('health :' + (playerinfo[0].player_health));
            playerif = {
                mana:playerinfo[0].player_mana,
                mana_total:playerinfo[0].player_total_mana,
                health:playerinfo[0].player_health,
-               energy:playerinfo[0].player_energy
+               energy:playerinfo[0].player_energy,
+               num:playerinfo[0].player_num
 
            }
            return playerinfo
@@ -326,7 +342,7 @@ async function MakeDeck() {
             headers: {
                 "Content-Type": "application/json"
               },
-            body: JSON.stringify({ plyId: 1}) 
+            body: JSON.stringify({ plyId: player_id}) 
         });
         if (response.status == 200) {
            var  result= await response.json();
@@ -372,6 +388,15 @@ async function getplayerdeck() {
         if (response.status == 200) {
            var playerdeck= await response.json();
            print(playerdeck);
+           print(playerdeck.length)
+           for(i = 0; i<playerdeck.length; i++){
+            playerdk[i] = {
+                card_id: playerdeck[i].deck_card_id,
+                card_name : playerdeck[i].card_name
+            }
+            print('num of cards per deck' + Object.keys(playerdk).length)
+           }
+           
         } else {
             // Treat errors like 404 here
             console.log(response);

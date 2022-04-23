@@ -207,7 +207,8 @@ app.post('/deck', async function( req, res) {
 
 app.get('/get_deck/:playerid', async function( req, res) {
   let playerid = req.params.playerid;
-  let sql = 'select * from deck where deck_player_id = $1 order by deck_order';
+  let sql = 'select * from deck , card where deck_player_id = 1 and'+
+              'deck_card_id = card_id order by deck_order';
 
     try{
       let result = await pool.query(sql,[playerid]);
