@@ -102,8 +102,7 @@ function end() {
   });
 }
 
-
-
+/////////////////////////////////////////////////////////////////
 app.get('/battle_states', async function( req, res) {
   console.log('helo')
   let sql = 'select * from battle_states'
@@ -115,7 +114,7 @@ app.get('/battle_states', async function( req, res) {
       console.log(err);
       res.status(500).send(err);
     }
-  })
+})
 
 app.get('/deck', async function( req, res) {
   console.log('helo')
@@ -131,9 +130,8 @@ app.get('/deck', async function( req, res) {
     }
     /* let card_id = result.row[0].deck_card_id
     print(card_id) */
-  })
+})
 
-    
 app.get('/player_info/:playerid', async function( req, res) {
   let playerid = req.params.playerid
   let sql = 'select * from player where player_id = $1'
@@ -163,7 +161,7 @@ order by player_num asc`
       console.log(err);
       res.status(500).send(err);
     }
-  })
+})
 
 app.get('/round_num/:playerid', async function( req, res) {
   let playerid = req.params.playerid;
@@ -219,7 +217,7 @@ app.get('/get_deck/:playerid', async function( req, res) {
       console.log(err);
       res.status(500).send(err);
     }
-  })
+})
 
 app.post('/player_information_change', async function( req, res) {
   let ply_health = req.body.ply_health;
@@ -273,7 +271,7 @@ app.post('/deck_card_state_change', async function( req, res) {
 
       let result = await pool.query(sql);
       console.log(result.rows);
-      res.status(200).send({ms: "Position Inserted"});
+      res.status(200).send({ms: "card_state_change Inserted"});
     } catch(err) {
       console.log(err);
       res.status(500).send(err);
