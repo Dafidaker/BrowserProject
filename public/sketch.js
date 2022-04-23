@@ -224,7 +224,7 @@ function CheckClick(x,y,x1,y1,w1,h1){
     } 
 }
 
-  function mousePressed(){
+function mousePressed(){
     //print(chessbuttons)
     //ChangePlayerInfo(1,2,2,2,2)
     //print('player tile: '+ player_tile)
@@ -242,7 +242,7 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }  
 
 function movement(selected , cur_place , range , type){
-    if(type = 4 && GameState == 1.1){
+    if(type == 4 && GameState == 1.1){
         if(selected<82 && selected>0 && playerif.energy>0 && selected != enemy_tile  ){
             for (range = range ; range > 0 ; range--){
                 print('being called')
@@ -271,9 +271,7 @@ function movement(selected , cur_place , range , type){
                 playerif.mana,
                 playerif.energy)
         };
-
     } 
-
 } 
 
 
