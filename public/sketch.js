@@ -430,3 +430,27 @@ async function ChangePlayerPosition(id,position) {
         console.log(err);
     }
 }
+
+async function ChangeCardState(id,card,newstate) {
+    try {
+        
+        const response = await fetch('/deck_card_state_change',
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify({ply_id: id, card_id:card, card_state_id:newstate}) 
+        });
+        if (response.status == 200) {
+           var  result= await response.json();
+           print(result);
+        } else {
+            // Treat errors like 404 here
+            console.log(response);
+        }
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+    }
+}
