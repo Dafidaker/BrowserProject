@@ -1,24 +1,30 @@
 //const { text } = require("body-parser");
 
 //const { text } = require("body-parser");
-  var player_id = 1   
-  var i = 1;
-  var battleRound;
-  var playerinfo;
-  var playerdeck;
-  var cur_round = '[Waiting for information ...]';
-  let canvasx
-  let canvasy
-  let chessbuttons = {}
-  let playerif = {mana: 0 , mana_total:0, health:20, energy:3 , num : 1}
-  let scalen  
-  let selected_tile_id = 100 
-  
+var player_id = 1   
+var playerdk = {}
+let playerif = {mana: 0 , mana_total:0, health:20, energy:3 , num : 1}
+var playerinfo;
 let playersposition 
+let selected_tile_id = 100 
 let player_tile = 2
 let enemy_tile = 2
 let users_num = 1
-let moving = false 
+
+var i = 1;
+
+var battleRound;
+
+var playerdeck;
+var cur_round = '[Waiting for information ...]';
+
+let chessbuttons = {}
+
+let scalen  
+
+
+let canvasx
+let canvasy
 
 //States
 var GameState = 1
@@ -28,6 +34,7 @@ var MyRoundState = 1
     var PlayingCardState = 1.2
 var EnemyState = 2
 
+//////////////////////////////////////SETUP///////////////////////////////////////////
 function setup() {
 
     //Create canvas
@@ -57,7 +64,6 @@ function setup() {
     background(233, 225, 206);
 }
 
-
 function SetInicialState() {
     ChangePlayerInfo(1,18,4,3,3) //(id,health,total_mana,mana,energy)
     ChangePlayerPosition(1,59) // (id,position)
@@ -76,37 +82,32 @@ function InicialInformation() {
     getplayerdeck() // gets the deck from one player 
     getplayersposition() // gets position from both players 
 }
-  
-function updateME(){
-    //CheckClick(mouseX,mouseY,100,100,100,100);
-    if(GameState == BasicState){
 
+function create_all_rect(){ 
+    let position = 350  
+    let x_reposition = ((9*60)/2)+60 // number of columns * width / half of the whole square 
+    if(i < 82){
+        for (var r = 1 ; r < 10 ; r= r + 1){
+            for (var c = 1 ; c < 10 ; c = c + 1){
 
+                chessbuttons[i] ={
+                    x:(canvasx/2) - x_reposition + (c*60),
+                    y:(canvasy/2) - position + (r*60),
+                    width: 60,
+                    height:60,
+                    letter:r,
+                    number:c+1
+                }
 
-    }else if(GameState == MyRoundState){
+                i = i + 1 ;
 
-        (selected_tile_id == player_tile) ? GameState = MovingState : null
-
-    }else if(GameState == MovingState){
-
-        
-        //movement(selected_tile_id , player_tile , 1 , 4)
-
-    }else if(GameState == PlayingCardState){
-
-
-    }else if(GameState == EnemyState){
-
-
-    }else{
-
-
-
+            }
+        }  
     }
-    //CheckMousePosition()
-  }
+}
 
-  function draw() {
+///////////////////////////////////DRAW//////////////////////////////////////////
+function draw() {
     //scales the drawin//
     scale(scalen)
 
@@ -142,32 +143,7 @@ function updateME(){
 ///////////////////////////////////////////////////
     //Update function//
         updateME();
-  } 
-  
-  
-
-function create_all_rect(){ 
-    let position = 350  
-    let x_reposition = ((9*60)/2)+60 // number of columns * width / half of the whole square 
-    if(i < 82){
-        for (var r = 1 ; r < 10 ; r= r + 1){
-            for (var c = 1 ; c < 10 ; c = c + 1){
-
-                chessbuttons[i] ={
-                    x:(canvasx/2) - x_reposition + (c*60),
-                    y:(canvasy/2) - position + (r*60),
-                    width: 60,
-                    height:60,
-                    letter:r,
-                    number:c+1
-                }
-
-                i = i + 1 ;
-
-            }
-        }  
-    }
-} 
+}   
 
 function draw_all_rect(){ 
     let chessbuttons_length = Object.keys(chessbuttons).length
@@ -233,6 +209,39 @@ function draw_hud(){
 }
 
 
+///////////////////////////////////UPDATE///////////////////////////////////////////
+function updateME(){
+    //CheckClick(mouseX,mouseY,100,100,100,100);
+    if(GameState == BasicState){
+
+
+
+    }else if(GameState == MyRoundState){
+
+        (selected_tile_id == player_tile) ? GameState = MovingState : null
+
+    }else if(GameState == MovingState){
+
+        
+        //movement(selected_tile_id , player_tile , 1 , 4)
+
+    }else if(GameState == PlayingCardState){
+
+
+    }else if(GameState == EnemyState){
+
+
+    }else{
+
+
+
+    }
+    //CheckMousePosition()
+}
+
+
+
+//////////////////////////////////MOUSE///////////////////////////////////////////////////
 function CheckClick(x,y,x1,y1,w1,h1){
     if((x >= x1 * scalen) && (x <=  (x1 + w1) * scalen)){
         if((y >= y1 * scalen) && (y <= (y1 + h1) * scalen)){
@@ -292,6 +301,7 @@ function movement(selected , cur_place , range , type){
 } 
 
 
+////////////////////////////////ENDPOINTS/////////////////////////////////////////////
 async function getBattleRound() {
     try {
         let playerid = 1;
@@ -389,14 +399,13 @@ async function getplayerdeck() {
            var playerdeck= await response.json();
            print(playerdeck);
            print(playerdeck.length)
-           for(i = 0; i<playerdeck.length; i++){
-            playerdk[i] = {
-                card_id: playerdeck[i].deck_card_id,
-                card_name : playerdeck[i].card_name
-            }
-            print('num of cards per deck' + Object.keys(playerdk).length)
+           for(i = 0; i < playerdeck.length; i++){
+                playerdk[i] = {
+                    card_id: playerdeck[i].deck_card_id,
+                    card_name : playerdeck[i].card_name
+                }
            }
-           
+           print('num of cards per deck' + Object.keys(playerdk).length)
         } else {
             // Treat errors like 404 here
             console.log(response);

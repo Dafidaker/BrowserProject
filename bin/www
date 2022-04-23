@@ -198,7 +198,7 @@ app.post('/deck', async function( req, res) {
       }
 
       result = await pool.query(sql);
-      res.status(200).send({ms: "Inserted"});
+      res.status(200).send({ms: "Created a Deck"});
     } catch(err) {
       console.log(err);
       res.status(500).send(err);
@@ -236,7 +236,7 @@ app.post('/player_information_change', async function( req, res) {
 
       let result = await pool.query(sql);
       console.log(result.rows);
-      res.status(200).send({ms: "Inserted"});
+      res.status(200).send({ms: "Player Information Updated"});
     } catch(err) {
       console.log(err);
       res.status(500).send(err);
@@ -253,7 +253,7 @@ app.post('/player_location_change', async function( req, res) {
 
       let result = await pool.query(sql);
       console.log(result.rows);
-      res.status(200).send({ms: "Position Inserted"});
+      res.status(200).send({ms: "Player Position Updated"});
     } catch(err) {
       console.log(err);
       res.status(500).send(err);
@@ -271,7 +271,7 @@ app.post('/deck_card_state_change', async function( req, res) {
 
       let result = await pool.query(sql);
       console.log(result.rows);
-      res.status(200).send({ms: "card_state_change Inserted"});
+      res.status(200).send({ms: "A card's state was updated"});
     } catch(err) {
       console.log(err);
       res.status(500).send(err);
