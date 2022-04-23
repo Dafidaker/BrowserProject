@@ -229,14 +229,15 @@ function CheckClick(x,y,x1,y1,w1,h1){
     //ChangePlayerInfo(1,2,2,2,2)
     //print('player tile: '+ player_tile)
     //print('selected tile: '+ selected_tile_id)
-    movement(selected_tile_id , player_tile , 1 , 4)
+    
     for (a=1 ; a <= 81; a++){
         if(CheckClick(mouseX,mouseY,chessbuttons[a].x,chessbuttons[a].y,chessbuttons[a].width,chessbuttons[a].height)){
             selected_tile_id = a 
             print('index ' + selected_tile_id)  
             break
         }
-    } 
+    }
+    movement(selected_tile_id , player_tile , 1 , 4) 
     
 }  
 
@@ -246,7 +247,7 @@ function movement(selected , cur_place , range , type){
         /* print(chessbuttons[selected].letter)
         print(chessbuttons[cur_place].letter)  */
         if(selected<82 && selected>0 && GameState == 1.1){
-            for (range = range +1; range > 0 ; range--){
+            for (range = range ; range > 0 ; range--){
                 /* print('selected: ' + chessbuttons[selected].letter + 
                 '\n' + 'above : ' + (chessbuttons[cur_place].letter + range) + 
                 '\n' + 'below : ' + (chessbuttons[cur_place].letter - range) + 
@@ -263,12 +264,10 @@ function movement(selected , cur_place , range , type){
                 (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
                         player_tile = selected
                         break
-                }else {
-                    GameState = MyRoundState
-                    //print('isnt moving') 
                 }
             }
         }else{}
+        (player_tile == selected) ? null : GameState = 1;
     } 
 
 } 
