@@ -6,6 +6,8 @@ let playerif = {mana: 0 , mana_total:0, health:20, energy:3 , num : 1}
 var playerinfo;
 let playersposition 
 let selected_tile_id = 100 
+let waiting_tile
+
 let player_tile = 2
 let enemy_tile = 2
 let users_num = 1
@@ -70,14 +72,14 @@ function setup() {
 }
 
 function SetInicialState() {
-    ChangePlayerInfo(1,18,4,3,3) //(id,health,total_mana,mana,energy)
+    ChangePlayerInfo(1,18,4,4,3) //(id,health,total_mana,mana,energy)
     ChangePlayerPosition(1,59) // (id,position)
     ChangeCardState(1,1,1)  // (id,card,newstate)
-    ChangeCardState(1,3,1)  // (id,card,newstate)
+    ChangeCardState(1,2,1)  // (id,card,newstate)
 
     ChangePlayerInfo(2,20,3,3,3) //(id,health,total_mana,mana,energy)
     ChangePlayerPosition(2,40) // (id,position)
-    ChangeCardState(2,2,1)  // (id,card,newstate)
+    ChangeCardState(2,3,1)  // (id,card,newstate)
     ChangeCardState(2,20,1)  // (id,card,newstate)
 }
 
@@ -133,6 +135,10 @@ function draw() {
     text(mouseY,10,100)
     text('Board: ' + clickingboard,10,150)
     text('Cards: ' + clickingcards,10,200)
+    text('Gamestate: '+ GameState,10,250)
+    text('tile selected: '+ selected_tile_id,10,300)
+    text('waiting tile: '+ waiting_tile,10,350)
+
     
 
     scale(scalen)
@@ -147,7 +153,7 @@ function draw() {
 
         /// draw ur cards
         DrawAllCards();
-        
+
 
         if(GameState == BasicState){
 
@@ -187,12 +193,20 @@ function draw_all_rect(){
             rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
             fill(127, 101, 57)
             text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 ); 
+            if (chessbuttons[index].highlighted == true){
+                fill(88, 216, 3,50)
+                rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
+            }
 
         } else {
             fill(127, 101, 57)
             rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
             fill(0,0,0)
             text(index, chessbuttons[index].x +30 , chessbuttons[index].y + 30 );
+            if (chessbuttons[index].highlighted == true){
+                fill(88, 216, 3,50)
+                rect(chessbuttons[index].x , chessbuttons[index].y, chessbuttons[index].width, chessbuttons[index].height)
+            }
         }
     }         
 } 
@@ -234,10 +248,7 @@ function draw_hud(){
     fill(87, 135, 239)
     circle(chessbuttons[enemy_tile].x + 30 ,chessbuttons[enemy_tile].y + 30,60)
 
-    //GameState
-    fill(0,0,0)
-    textSize(30)
-    text(GameState,canvasx*0.8,canvasy*0.5)
+
 }
 
 function DrawAllCards(){
@@ -248,31 +259,29 @@ function DrawAllCards(){
 
     let width = 120
     let height = 170
-    for(i= 0 ; i < (Object.keys(playerdk).length - 1) ; i++){
+    fill(179, 152, 86)
+    rect(canvasx*0.3,canvasy*0.8,canvasx*0.4,canvasy*0.2)
+    for(i= 0 ; i < (Object.keys(playerdk).length ) ; i++){
         if(playerdk[i].card_state_id == 1 ){
-            fill(0,0,0)
             
-            let NegativeX = canvasx*0.5  - (width*i) - (height/2) - (SpaceBetweenCards/2)
-            playerdk[i].x = NegativeX
+            playerdk[i].x = canvasx*0.35 + ((width + SpaceBetweenCards)*i)
             playerdk[i].y = canvasy*0.8
-            playerdk[i].width = 120
-            playerdk[i].height = 170
-            rect(playerdk[i].x,playerdk[i].y,width,height)
-            
+            playerdk[i].width = width
+            playerdk[i].height = height
 
-            let PositiveX = canvasx*0.5  + (width*i) + (height/2) + (SpaceBetweenCards/2)
-            playerdk[i+1].x = PositiveX
-            playerdk[i+1].y = canvasy*0.8
-            playerdk[i+1].width = 120
-            playerdk[i+1].height = 170
-            rect(playerdk[i+1].x,playerdk[i+1].y,width,height)
+            fill(0,0,0)
+            rect(playerdk[i].x,playerdk[i].y,playerdk[i].width,playerdk[i].height)
             
             textSize(15)
             fill(255,255,255)
             text(playerdk[i].card_name,playerdk[i].x ,playerdk[i].y+(height/2) )
-            text(playerdk[i+1].card_name,playerdk[i+1].x,playerdk[i+1].y +(height/2) )
+            
 
+        }else if(playerdk[i].card_state_id == 2 ){
+            playerdk[i].x = null
+            playerdk[i].y = null
         }
+        
     }
 }
 
@@ -303,8 +312,14 @@ function updateME(){
     }else{
 
 
-
     }
+
+    // if arent clicking cards when no highlighting
+    if (GameState != PlayingCardState) {
+        for(i = 1 ; i < 82 ; i++){
+            chessbuttons[i].highlighted = false
+    }}
+
     //CheckMousePosition()
 }
 
@@ -333,21 +348,43 @@ function mousePressed(){
         }
     }
     
-    movement(selected_tile_id , player_tile , 1 , 4) 
+    movement(selected_tile_id , player_tile , 1 , 1) 
     
     // playing card 
     for(i = 0 ; i <  Object.keys(playerdk).length  ; i++){
-        print('TIME')
+        //print('TIME')
         if(CheckClick(mouseX,mouseY,playerdk[i].x,playerdk[i].y,playerdk[i].width,playerdk[i].height)){
+            
             CardSelect_index = i
+            
             print('card select ' + CardSelect_index)  
-            GameState = PlayingCardState
-            clickingcards = true
+
+            if( playerif.mana >= playerdk[CardSelect_index].card_mana_cost){
+
+                GameState = PlayingCardState
+                selected_tile_id = null
+                clickingcards = true
+
+                GetTilesHighlighted()    
+
+
+            }else{
+                CardSelect_index = null
+                alert('Not enough Mana')
+            }
+
+            
+            
+    
             break
         }else{
             clickingcards = false
+            
         }
     }
+    //print(playerdk[CardSelect_index].card_type_range_id)
+    
+    movement(selected_tile_id , player_tile , playerdk[CardSelect_index].card_range ,playerdk[CardSelect_index].card_type_range_id)
     
     //if not cliking on board or cards goes back to roundstate
     if (clickingcards == false && clickingboard == false){
@@ -357,8 +394,10 @@ function mousePressed(){
 }  
 
 function movement(selected , cur_place , range , type){
-    if(type == 4 && GameState == 1.1){
-        if(selected<82 && selected>0 && playerif.energy>0 && selected != enemy_tile  ){
+    print('gamestate: '+ GameState)
+    // moving around the board
+    if(type == 1 && GameState == 1.1){
+        if(selected<82 && selected>0 && playerif.energy > 0 && selected != enemy_tile  ){
             for (range = range ; range > 0 ; range--){
                 if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
                 (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
@@ -374,6 +413,10 @@ function movement(selected , cur_place , range , type){
                         break
                 }
             }
+        }else if(playerif.energy == 0){
+            //alert('Not enough energy')
+        }else if (selected == enemy_tile){
+            alert('Cant move into a tile occupied by the enemy')
         };
 
         if(player_tile != selected){
@@ -386,22 +429,109 @@ function movement(selected , cur_place , range , type){
                 playerif.energy)
         };
     } 
-} 
+    
+    // playing a card of the orthogonal pattern
+    if(type == 4 && GameState == 1.2 && playerif.mana >= playerdk[CardSelect_index].card_mana_cost){
+        if(selected<82 && selected>0 ){
+            for (range = range ; range > 0 ; range--){
+                if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
+                (chessbuttons[selected].letter == chessbuttons[cur_place].letter - range)) &&
+                (chessbuttons[selected].number == chessbuttons[cur_place].number) ){
 
+                    playerif.mana -= playerdk[CardSelect_index].card_mana_cost
+
+                    if(playerdk[CardSelect_index].card_id == 1){
+                        ChangeCardState(player_id,playerdk[CardSelect_index].card_id,3) 
+                        playerdk[CardSelect_index].card_state_id = 3
+                    }else{
+                        ChangeCardState(player_id,playerdk[CardSelect_index].card_id,2)  
+                        playerdk[CardSelect_index].card_state_id = 2
+                    }
+                    
+                    //Play(player_id, room_id, battleRound[0].room_round_number, play_num,play_tp_id, play_tile_id, play_state_id)
+
+                    ChangePlayerInfo(player_id,
+                        playerif.health,
+                        playerif.mana_total,
+                        playerif.mana,
+                        playerif.energy)
+
+                    CardSelect_index = null 
+
+                    GameState = 1
+                    break 
+
+                }else if (((chessbuttons[selected].number == chessbuttons[cur_place].number + range) ||  
+                (chessbuttons[selected].number == chessbuttons[cur_place].number - range)) &&
+                (chessbuttons[selected].letter == chessbuttons[cur_place].letter) ){
+
+                    playerif.mana -= playerdk[CardSelect_index].card_mana_cost
+
+                    if(playerdk[CardSelect_index].card_id == 1){
+                        ChangeCardState(player_id,playerdk[CardSelect_index].card_id,3) 
+                        playerdk[CardSelect_index].card_state_id = 3
+                    }else{
+                        ChangeCardState(player_id,playerdk[CardSelect_index].card_id,2)  
+                        playerdk[CardSelect_index].card_state_id = 2
+                    }
+                    
+                    ChangePlayerInfo(player_id,
+                        playerif.health,
+                        playerif.mana_total,
+                        playerif.mana,
+                        playerif.energy)
+                    GameState = 1
+                    CardSelect_index = null 
+                    break
+
+                    
+                }
+                
+            }
+        }
+
+    }
+} 
 
 function keyPressed() {
     print('0')
     if (keyCode === LEFT_ARROW ) {
         (grid == true)? grid = false : grid = true ;
+        print(chessbuttons)
     }
+}
+
+function GetTilesHighlighted(){
+    print('11')
+    //movement(player_tile , player_tile , playerdk[CardSelect_index].card_range ,playerdk[CardSelect_index].card_type_range_id) 
+    let range = playerdk[CardSelect_index].card_range 
+    let type = playerdk[CardSelect_index].card_type_range_id
+    if(type == 4){
+        print('22')
+        for (range = range ; range > 0 ; range--){
+            print('range' + range)
+             for(i = 1 ; i < 82 ; i++){
+                if (((chessbuttons[i].letter == chessbuttons[player_tile].letter + range) || 
+                (chessbuttons[i].letter == chessbuttons[player_tile].letter - range)) &&
+                (chessbuttons[i].number == chessbuttons[player_tile].number) ){
+                    print('33')
+                        chessbuttons[i].highlighted = true 
+                }else if (((chessbuttons[i].number == chessbuttons[player_tile].number + range) ||  
+                (chessbuttons[i].number == chessbuttons[player_tile].number - range)) &&
+                (chessbuttons[i].letter == chessbuttons[player_tile].letter) ){
+                        chessbuttons[i].highlighted = true 
+                }
+            }  
+        }    
+    }
+     
 }
 
 
 ////////////////////////////////ENDPOINTS/////////////////////////////////////////////
 async function getBattleRound() {
     try {
-        let playerid = 1;
-        const response = await fetch(`/round_num/${playerid}`);
+        const response = await fetch(`/round_num/${player_id}`);
         if (response.status == 200) {
            var battleRound= await response.json();
            cur_round = 'Round ' + (battleRound[0].room_round_number) + ' - '  + (battleRound[0].state_name); // Round [nº]
@@ -417,8 +547,7 @@ async function getBattleRound() {
 
 async function getplayerinformation() {
     try {
-        let playerid = 1;
-        const response = await fetch(`/player_info/${playerid}`);
+        const response = await fetch(`/player_info/${player_id}`);
         if (response.status == 200) {
            var playerinfo = await response.json();
            playerif = {
@@ -489,8 +618,7 @@ async function ChangePlayerInfo(id,health,total_mana,mana,energy) {
 
 async function getplayerdeck() {
     try {
-        let playerid = 1;
-        const response = await fetch(`/get_deck/${playerid}`);
+        const response = await fetch(`/get_deck/${player_id}`);
         if (response.status == 200) {
            var playerdeck = await response.json();
            //print(playerdeck);
@@ -499,7 +627,13 @@ async function getplayerdeck() {
                 playerdk[i] = {
                     card_id: playerdeck[i].deck_card_id,
                     card_name : playerdeck[i].card_name,
-                    card_state_id: playerdeck[i].deck_card_state_id
+                    card_state: playerdeck[i].card_state_name,
+                    card_state_id: playerdeck[i].deck_card_state_id,
+                    card_mana_cost: playerdeck[i].card_mana,
+                    card_range: playerdeck[i].card_range,
+                    card_type_range_id: playerdeck[i].card_type_range_id,
+                    card_type_range: playerdeck[i].type_range_name,
+                    card_cast : playerdeck[i].type_cast_name
                     
                 }
            }
@@ -517,8 +651,7 @@ async function getplayerdeck() {
 
 async function getplayersposition() {
     try {
-        let playerid = 1;
-        const response = await fetch(`/player_tile/${playerid}`);
+        const response = await fetch(`/player_tile/${player_id}`);
         if (response.status == 200) {
            playersposition = await response.json();
            if (users_num = 1) {
@@ -588,3 +721,45 @@ async function ChangeCardState(id,card,newstate) {
         console.log(err);
     }
 }
+
+async function Play(id,room_id,round_number,play_num,play_tp_id,play_tile_id,play_state_id) {
+    try {
+        
+        const response = await fetch('/play',
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+              },
+            body: JSON.stringify({ player_id: id, room_id: room_id, round_number: round_number, 
+                                    play_num: play_num, play_tp_id: play_tp_id, play_tile_id:play_tile_id,
+                                    play_state_id:play_state_id}) 
+        });
+        if (response.status == 200) {
+           var  result= await response.json();
+           print(result);
+        } else {
+            // Treat errors like 404 here
+            console.log(response);
+        }
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+    }
+}
+
+async function GetPlays() {
+    try {
+        const response = await fetch(`/getplays/${player_id}`);
+        if (response.status == 200) {
+           var playerinfo = await response.json();
+           
+        } else {
+            // Treat errors like 404 here
+            console.log(response);
+        }
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+    }
+} 

@@ -207,7 +207,7 @@ app.post('/deck', async function( req, res) {
 
 app.get('/get_deck/:playerid', async function( req, res) {
   let playerid = req.params.playerid;
-  let sql = 'select * from deck , card where deck_player_id = $1 and deck_card_id = card_id order by deck_order';
+  let sql = 'select * from deck , card, type_range , type_cast ,card_state  where deck_card_state_id = card_state_id and card_type_range_id = type_range_id and card_type_cast_id = type_cast_id and deck_player_id = $1 and deck_card_id = card_id order by deck_order';
 
     try{
       let result = await pool.query(sql,[playerid]);
@@ -276,4 +276,44 @@ app.post('/deck_card_state_change', async function( req, res) {
       console.log(err);
       res.status(500).send(err);
     }
-}) 
+})
+
+app.post('/play', async function( req, res) {
+  let room_id = req.body.room_id
+  let round_number = req.body.round_number
+  let play_num = req.body.play_num
+  let play_tp_id = req.body.play_tp_id
+  let play_tile_id = req.body.play_tile_id
+  let play_player_id = req.body.player_id
+  let play_state_id = req.body.play_state_id
+
+
+    try{
+      
+        sql = `insert into play (play_room_id, play_round_number, play_state_id, play_num, play_tp_id, play_tile_id, play_player_id) values`;
+        sql += `(${room_id}, ${round_number},${play_state_id}, ${play_num}, ${play_tp_id}, ${play_tile_id}, ${play_player_id});`;
+        
+      
+      
+
+      result = await pool.query(sql);
+      res.status(200).send({ms: "Posted a Play"});
+    } catch(err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+})
+
+app.get('/getplays/:playerid', async function( req, res) {
+  let playerid = req.params.playerid;
+  let sql = 'select * from (select room_id as thenum from room where room_player_id = $1)temptable , play where play_room_id = thenum ';
+
+    try{
+      let result = await pool.query(sql,[playerid]);
+      console.log(result.rows);
+      res.status(200).send(result.rows);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+})
