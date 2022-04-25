@@ -134,7 +134,7 @@ app.get('/deck', async function( req, res) {
 
 app.get('/player_info/:playerid', async function( req, res) {
   let playerid = req.params.playerid
-  let sql = 'select * from player where player_id = $1'
+  let sql = 'select * from player, room  where room_player_id = $1  order by player_num asc'
     try{
       let result = await pool.query(sql,[playerid])
       console.log(result.rows);
@@ -165,7 +165,7 @@ order by player_num asc`
 
 app.get('/round_num/:playerid', async function( req, res) {
   let playerid = req.params.playerid;
-  let sql = 'select room_round_number , state_name from room , battle_states where room_player_id = $1 and room_state_id = state_id '
+  let sql = 'select room_state_id ,room_num, room_round_number , state_name from room , battle_states where room_player_id = $1 and room_state_id = state_id '
 
     try{
       let result = await pool.query(sql, [playerid])
@@ -306,7 +306,7 @@ app.post('/play', async function( req, res) {
 
 app.get('/getplays/:playerid', async function( req, res) {
   let playerid = req.params.playerid;
-  let sql = 'select * from (select room_id as thenum from room where room_player_id = $1)temptable , play where play_room_id = thenum ';
+  let sql = 'select * from (select room_num as thenum from room where room_player_id = $1)temptable , play where play_room_id = thenum order by play_num Desc ';
 
     try{
       let result = await pool.query(sql,[playerid]);
@@ -317,3 +317,36 @@ app.get('/getplays/:playerid', async function( req, res) {
       res.status(500).send(err);
     }
 })
+
+app.get('/getRoom/:playerid', async function( req, res) {
+  let playerid = req.params.playerid;
+  let sql = 'select * from room where room_player_id = $1'  ;
+    try{
+      let result = await pool.query(sql,[playerid]);
+      console.log(result.rows);
+      res.status(200).send(result.rows);
+    } catch(err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+})
+
+app.post('/round_number', async function( req, res) {
+  let newstate = req.body.newstate
+  let newround = req.body.newround
+  let room_num = req.body.room_num
+    try{
+      sql = `UPDATE room
+            SET room_round_number = ${newround},
+            room_state_id = ${newstate}
+
+            WHERE room_num = ${room_num}`;
+
+      let result = await pool.query(sql);
+      console.log(result.rows);
+      res.status(200).send({ms: "Round information Changed"});
+    } catch(err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+}) 

@@ -6,8 +6,6 @@ let playerif = {mana: 0 , mana_total:0, health:20, energy:3 }
 let enemyif = {mana: 0 , mana_total:0, health:20, energy:3 }
 var playerinfo;
 var AllPlays
-var Plays = {}
-var MaxPlays = 0 
 let playersposition 
 let selected_tile_id = 100 
 let waiting_tile
@@ -78,7 +76,7 @@ function setup() {
     //creates the squares for the board
     create_all_rect()
 
-    //setInterval(CheckPlays,5000);
+    setInterval(GetPlays,5000);
 
 }
 
@@ -103,14 +101,7 @@ function InicialInformation() {
     getplayerinformation() // gets all the information from one player , 
     getplayerdeck() // gets the deck from one player 
     getplayersposition() // gets position from both players 
-
-    if(playerif.num == Round.State ){
-        GameState= MyRoundState
-    }else if (playerif.num != Round.State ){
-        GameState= EnemyState
-    } 
     //GetPlays()
-
 }
 
 function create_all_rect(){ 
@@ -140,7 +131,6 @@ function create_all_rect(){
         width: canvasx*0.1,
         height: canvasy*0.1,
         text: 'End Turn'}
-
 }
 
 ///////////////////////////////////DRAW//////////////////////////////////////////
@@ -166,11 +156,8 @@ function draw() {
     text('Board: ' + clickingboard,10,150)
     text('Cards: ' + clickingcards,10,200)
     text('Gamestate: '+ GameState,10,250)
-    text(' n: '+ n,10,300)
-    text('maxplays: '+ MaxPlays,10,350)
-    text('slected: '+ selected_tile_id,10,400)
-    text('player tile: '+ player_tile,10,450)
-
+    text('tile selected: '+ selected_tile_id,10,300)
+    text('waiting tile: '+ waiting_tile,10,350)
 
     
 
@@ -178,15 +165,16 @@ function draw() {
 
     //Always
         DrawGrid();
+        
+
+        ///drawing the hud
+        draw_hud();
 
         /// draw ur cards
         DrawAllCards();
 
         //drawing the board
         draw_all_rect(); 
-        
-        ///drawing the hud
-        draw_hud();
 
         if(GameState == BasicState){
 
@@ -195,11 +183,11 @@ function draw() {
         }else if(GameState == MyRoundState){
             BackgroundColor = [233, 225, 206]; //beige
 
-            
+            //(selected_tile_id == player_tile) ? GameState = MovingState : null
 
         }else if(GameState == MovingState){
             BackgroundColor = [206, 219, 233] //blue
-           
+           // movement(selected_tile_id , player_tile , 1 , 4)
 
         
         }else if(GameState == PlayingCardState){
@@ -242,20 +230,19 @@ function draw_all_rect(){
             }
         }
     } 
-    /* if(GameState == BasicState ){
-        fill(255,255,255)
-        rect(0,0,canvasx,canvasy)
     
-    } */
 
     for (i=1 ; i <= Object.keys(clicablebuttons).length; i++){
-        if(GameState != BasicState) {
-            fill(51, 46, 46)
+        fill(51, 46, 46)
         rect(clicablebuttons[i].x,clicablebuttons[i].y,clicablebuttons[i].width,clicablebuttons[i].height)
         fill(255,255,255)
         text(clicablebuttons[i].text,clicablebuttons[i].x+(clicablebuttons[i].width/2.5),clicablebuttons[i].y+ (clicablebuttons[i].height/2))
-        }
-        
+    }
+    
+    if(GameState == BasicState ){
+        fill(255,255,255)
+        rect(0,0,canvasx,canvasy)
+    
     }        
 } 
 
@@ -355,7 +342,7 @@ function updateME(){
 
     }else if(GameState == MyRoundState){
 
-        
+        //(selected_tile_id == player_tile) ? GameState = MovingState : null
 
     }else if(GameState == MovingState){
 
@@ -372,12 +359,6 @@ function updateME(){
 
 
     }
-
-    /* if(playerif.num == Round.State ){
-        GameState= MyRoundState
-    }else if (playerif.num != Round.State ){
-        GameState= EnemyState
-    } */
 
     // if arent clicking cards when no highlighting
     if (GameState != PlayingCardState) {
@@ -401,6 +382,8 @@ function CheckClick(x,y,x1,y1,w1,h1){
 }
 
 function mousePressed(){
+
+   
    
     if(GameState != EnemyState && GameState != BasicState){
      //Movement
@@ -409,8 +392,7 @@ function mousePressed(){
             selected_tile_id = a 
             chessbuttons[selected_tile_id].highlighted = true 
             print('index ' + selected_tile_id) ;
-            (selected_tile_id == player_tile )? GameState = MovingState : null ;
-            
+            (selected_tile_id == player_tile && GameState != EnemyState)? GameState = MovingState : null ;
             clickingboard = true
             break
         }else{
@@ -460,13 +442,9 @@ function mousePressed(){
                 }else if(Round.State == 2){
                     Round.State = 1
                 }
-
-                print('culprit one' )
                 GameState = EnemyState
                 print('state: '+ Round.State)
                 ChangeRound_Num_State(RoomNum,Round.Number + 1 ,Round.State)
-                Play(player_id,RoomNum,Round.Number,MaxPlays +1 ,4,null,Round.State)
-                 
                 break
             }
         }
@@ -474,12 +452,12 @@ function mousePressed(){
 
     //print(playerdk[CardSelect_index].card_type_range_id)
     
-    (GameState == PlayingCardState) ? movement(selected_tile_id , player_tile , playerdk[CardSelect_index].card_range ,playerdk[CardSelect_index].card_type_range_id) : null ;
+    movement(selected_tile_id , player_tile , playerdk[CardSelect_index].card_range ,playerdk[CardSelect_index].card_type_range_id)
     
     //if not cliking on board or cards goes back to roundstate
     if (clickingcards == false && clickingboard == false){
         GameState = MyRoundState
-    }   
+    }  
    }
     
    
@@ -489,7 +467,6 @@ function movement(selected , cur_place , range , type){
     print('gamestate: '+ GameState)
     // moving around the board
     if(type == 1 && GameState == 1.1){
-        print('gamestate: '+ GameState)
         if(selected<82 && selected>0 && playerif.energy > 0 && selected != enemy_tile  ){
             for (range = range ; range > 0 ; range--){
                 if (((chessbuttons[selected].letter == chessbuttons[cur_place].letter + range) || 
@@ -513,17 +490,13 @@ function movement(selected , cur_place , range , type){
         };
 
         if(player_tile != selected){
-            
             GameState = 1
-            print('gamestate: '+ GameState)
             ChangePlayerPosition(player_id,player_tile)
             ChangePlayerInfo(player_id,
                 playerif.health,
                 playerif.mana_total,
                 playerif.mana,
                 playerif.energy)
-            Play(player_id,RoomNum,Round.Number,MaxPlays +1 ,2,player_tile,Round.State)
-            
         };
     } 
     
@@ -546,7 +519,7 @@ function movement(selected , cur_place , range , type){
                     }
                     getBattleRound()
                     GetPlays()
-                    Play(player_id, battleRound[0].room_id, battleRound[0].room_round_number, MaxPlays+1 ,3, selected_tile_id, battleRound[0].room_state_id)
+                    Play(player_id, battleRound[0].room_id, battleRound[0].room_round_number, Object.keys(AllPlays).length+1 ,3, selected_tile_id, battleRound[0].room_state_id)
                    
                     ChangePlayerInfo(player_id,
                         playerif.health,
@@ -595,7 +568,7 @@ function keyPressed() {
     print('0')
     if (keyCode === LEFT_ARROW ) {
         (grid == true)? grid = false : grid = true ;
-        GetPlays()
+        print(chessbuttons)
     }
 }
 
@@ -626,20 +599,18 @@ function GetTilesHighlighted(){
 }
 
 function CheckPlays(){
-    //GetPlays()
-
    if(n != MaxPlays){
        let NewPlays = MaxPlays - n
        for ( i = NewPlays ; i = MaxPlays ; i++){
-            if(Plays[i].type == 2){
+            if(Play[i].type ==2){
                 getplayerinformation()
-            }else if (Plays[i].type == 3){
+            }else if (Play[i].type == 3){
                 
-                if(Plays[i].tile == player_tile){
-                    (Plays[i].card == 2 )? ChangePlayerInfo(player_id,playerif.health - 4,playerif.mana_total, playerif.mana,playerif.energy) :null 
+                if(Play[i].tile == player_tile){
+                    (Play[i].card == 2 )? ChangePlayerInfo(player_id,playerif.health - 4,playerif.mana_total, playerif.mana,playerif.energy) :null 
                 }
                 getplayerinformation()
-            }else if (Plays[i].type ==4 ){
+            }else if (Play[i].type ==4 ){
                 GameState = MyRoundState 
             }
        }
@@ -649,22 +620,13 @@ function CheckPlays(){
 }
 
 function Player1(){
-    player_id = 1
-    SetInicialState()
-    InicialInformation()
-    //window.location.assign("index_.html")
-    print('1111 playerif.num: '+ playerif.num)
-    
+    var player_id = 1
+    window.location.assign("GAME.html")
 }
 
 function Player2(){
-    player_id = 2
-    SetInicialState()
-    InicialInformation()
-    //window.location.assign("index_.html")
-    print('2222 playerif.num: '+ playerif.num)
-
-    
+    var player_id = 2
+    window.location.assign("GAME.html")
 }
 ////////////////////////////////ENDPOINTS/////////////////////////////////////////////
 async function getBattleRound() {
@@ -678,7 +640,6 @@ async function getBattleRound() {
                 Number : battleRound[0].room_round_number,
            }
            RoomNum = battleRound[0].room_num
-
            
         } else {
             // Treat errors like 404 here
@@ -730,7 +691,7 @@ async function getplayerinformation() {
     }
 } 
 
-/* async function MakeDeck() {
+async function MakeDeck() {
     try {
         const response = await fetch(`/deck`,
         {
@@ -751,7 +712,7 @@ async function getplayerinformation() {
         // Treat 500 errors here
         console.log(err);
     }
-} */
+}
 
 async function ChangePlayerInfo(id,health,total_mana,mana,energy) {
     try {
@@ -910,27 +871,22 @@ async function Play(id,room_id,round_number,play_num,play_tp_id,play_tile_id,pla
 }
 
 async function GetPlays() {
-    /* try {
+    try {
+        print('1,2,3,4,5')
         const response = await fetch(`/getplays/${player_id}`);
         if (response.status == 200) {
-            AllPlays =  await response.json();
-           
-
-           MaxPlays = JSON.stringify(AllPlays[0].play_num)
-            for( i = 0 ; i <= MaxPlays-1 ; i++){
-              Plays[JSON.stringify(AllPlays[i].play_num)]= {
-                type: JSON.stringify(AllPlays[i].play_tp_id),
-                player: JSON.stringify(AllPlays[i].play_player_id),
-                num: JSON.stringify(AllPlays[i].play_num),
-                card: JSON.stringify(AllPlays[i].play_card_id),
-                tile: JSON.stringify(AllPlays[i].play_tile_id),
-                round: JSON.stringify(AllPlays[i].play_round_number)
-            
-            } 
-            print(Plays[0].type)
-        } 
-            
-           
+           var AllPlays = await response.json();
+            print('all plays: '+ AllPlays[1].play_num)
+            print('all plays: '+ AllPlays[1].play_num)
+            Plays[AllPlays[i].play_num]= {
+                type: AllPlays[i].play_tp_id,
+                player: AllPlays[i].play_player_id,
+                num: AllPlays[i].play_num,
+                card: AllPlays[i].play_card_id,
+                tile: AllPlays[i].play_tile_id,
+                round: AllPlays[i].play_round_number
+            }
+            MaxPlays = AllPlays[0].play_num
         } else {
             // Treat errors like 404 here
             console.log(response);
@@ -938,7 +894,7 @@ async function GetPlays() {
     } catch (err) {
         // Treat 500 errors here
         console.log(err);
-    } */
+    }
 } 
 
 async function ChangeRound_Num_State(room_num,newroundnum,newstate) {

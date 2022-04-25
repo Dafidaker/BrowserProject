@@ -5,7 +5,7 @@ async function loginUser() {
         let password = document.getElementById("password").value;
         let result = await login(name, password);
         if (result.logged) {
-            window.location = "rooms.html"
+            window.location = "index.html"
         } else {
             document.getElementById("result").innerHTML = "Wrong username or password";
         }
@@ -26,7 +26,7 @@ async function login(name, password) {
             body: JSON.stringify({ player_name: name, player_password: password}) 
         });
         var  result= await response.json();
-        return {logged: response.status==200 , result: result };
+        return {logged: response.status=200 , result: result };
     } catch (err) {
         // Treat 500 errors here
         console.log(err);
